@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 import time
 import json
 import math
@@ -19,6 +19,7 @@ class Captcha:
         # Session data storage
         self.session_data = {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
+            'session_user':[],
             'mouse_movements': [],
             'timestamps': [],
             'velocities': [],
@@ -28,12 +29,26 @@ class Captcha:
             'distance_traveled': 0
         }
         
+        # Record session user
+        name = simpledialog.askstring(
+            title="Identificação",
+            prompt="Digite seu nome e último sobrenome:",
+            parent=self.root
+        )
+        if name is None:
+            self.session_data["session_user"].append("UNKNOWN")
+        else:
+            self.session_data["session_user"].append(name.strip().upper())
+
+        print(self.session_data["session_user"])
+        
         # Tracking variables
         self.start_time = time.time() 
         self.last_position = None
         self.last_time = time.time()
         self.is_tracking = True  
         self.checkbox_checked = False
+        self.sessions_count = 1
         
         # Recent positions for acceleration calculation
         self.recent_positions = deque(maxlen=6)
@@ -96,7 +111,7 @@ class Captcha:
         )
         self.status_label.pack(pady=10)
         
-        #! Movement counter (remember to remove after models are implemented)
+        #! Movement counter 
         self.counter_label = tk.Label(
             main_frame,
             text="Movimentos: 0",
@@ -240,7 +255,8 @@ class Captcha:
         self.session_data['metrics'] = self.calculate_metrics()
         
         # Save to JSON file
-        filename = f"captcha_data/session_{self.session_data['session_id']}.json"
+        name = self.session_data['session_user'][0].replace(' ' , '_')
+        filename = f"captcha_data/session_{self.session_data['session_id']}_{name}.json"
         with open(filename, 'w') as f:
             json.dump(self.session_data, f, indent=2)
         
@@ -255,11 +271,14 @@ class Captcha:
         # Record another session poup
         response = messagebox.askyesno(
             "New session? | Nova sessão?",
-            "Would you like to record new session? | Gostaria de registrar uma nvoa seção?"
+            f"""Would you like to record new session? | Gostaria de registrar uma nvoa seção? \n
+            Sessions untill now: {self.sessions_count}"""
         )
         
         if response:
+            self.sessions_count = self.sessions_count + 1
             self.reset_session()
+            
         else:
             self.root.quit()
         
@@ -297,6 +316,7 @@ class Captcha:
         
         self.session_data = {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
+            'session_user':self.session_data["session_user"],
             'mouse_movements': [],
             'timestamps': [],
             'velocities': [],
@@ -305,6 +325,8 @@ class Captcha:
             'total_time': 0,
             'distance_traveled': 0
         }
+        
+        self.setup_ui()
         
 
 
