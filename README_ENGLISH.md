@@ -1,4 +1,27 @@
 # ENGLISH
+
+#### LINUX 
+
+```bash
+sudo apt update
+sudo apt install python3-tk
+git clone #link
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python data_collection.py
+```
+
+#### Windows (PowerShell)
+
+```powershell
+git clone #link
+python -m venv venv
+venv\Scripts\Activate
+pip install -r requirements.txt
+python data_collection.py
+```
+
 # Behavioral CAPTCHA – Data Collection
 
 This project aims to **collect behavioral user data** during interaction with a graphical interface, with the goal of building a dataset for **human vs. bot detection** using *One-Class Classification* techniques (One-Class SVM and Isolation Forest), as part of my **Undergraduate Thesis**.
@@ -32,28 +55,6 @@ The following are required:
 
 The main libraries used include:
 `tkinter`, `json`, `time`, `uuid`, `os`
-
-### Linux
-
-```bash
-sudo apt update
-sudo apt install python3-tk
-git clone #link
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python data_collection.py
-```
-
-### Windows (PowerShell)
-
-```powershell
-git clone #link
-python -m venv venv
-venv\Scripts\Activate
-pip install -r requirements.txt
-python data_collection.py
-```
 
 When running the application, the system will:
 

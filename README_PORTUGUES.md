@@ -1,5 +1,27 @@
 
 # PORTUGUÊS
+#### LINUX 
+
+```bash
+sudo apt update
+sudo apt install python3-tk
+git clone #link
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python data_collection.py
+```
+
+#### Windows (PowerShell)
+
+```powershell
+git clone #link
+python -m venv venv
+venv\Scripts\Activate
+pip install -r requirements.txt
+python data_collection.py
+```
+
 # CAPTCHA Comportamental – Coleta de Dados
 
 Este projeto tem como objetivo a **coleta de dados comportamentais de usuários** durante a interação com uma interface gráfica, visando a construção de um dataset para estudos de **detecção de humanos vs bots** utilizando técnicas de *One-Class Classification* (One-Class SVM e Isolation Forest) como parte do meu Trabalho de Conclusão de Curso.
@@ -31,28 +53,6 @@ Será necessário ter instalado:
 * **IDE de sua preferência**
 
 As principais bibliotecas utilizadas incluem: `tkinter`, `json`, `time`, `uuid`, `os`
-
-#### LINUX 
-
-```bash
-sudo apt update
-sudo apt install python3-tk
-git clone #link
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python data_collection.py
-```
-
-#### Windows (PowerShell)
-
-```powershell
-git clone #link
-python -m venv venv
-venv\Scripts\Activate
-pip install -r requirements.txt
-python data_collection.py
-```
 
 Ao executar, o sistema irá:
 
