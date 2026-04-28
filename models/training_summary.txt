@@ -1,0 +1,52 @@
+======================================================================
+FEATURE SELECTION TRAINING SUMMARY
+Updated Parameters: nu=0.05, gamma='scale', contamination=0.05
+Train/Test Split: 80/20
+======================================================================
+
+
+CORE_8
+----------------------------------------------------------------------
+Number of features: 8
+Features: std_velocity, velocity_entropy, directness_ratio, avg_curvature, total_time, direction_changes, jitter, num_pauses
+
+One-Class SVM:
+  Training FP Rate: 4.97%
+  Test FP Rate:     4.55%
+
+Isolation Forest:
+  Training FP Rate: 10.05%
+  Test FP Rate:     8.68%
+
+
+KINEMATIC_GEOMETRIC_12
+----------------------------------------------------------------------
+Number of features: 9
+Features: std_velocity, velocity_entropy, std_acceleration, jitter, total_distance, directness_ratio, avg_curvature, direction_changes, avg_distance_per_movement
+
+One-Class SVM:
+  Training FP Rate: 5.18%
+  Test FP Rate:     5.79%
+
+Isolation Forest:
+  Training FP Rate: 10.05%
+  Test FP Rate:     10.33%
+
+
+ALL_FEATURES
+----------------------------------------------------------------------
+Number of features: 21
+Features: total_time, time_to_click, num_movements, movement_frequency, total_distance, avg_distance_per_movement, std_velocity, max_velocity, min_velocity, velocity_range, velocity_entropy, std_acceleration, max_acceleration, min_acceleration, acceleration_range, directness_ratio, avg_curvature, direction_changes, jitter, num_pauses, avg_pause_duration
+
+One-Class SVM:
+  Training FP Rate: 4.77%
+  Test FP Rate:     4.96%
+
+Isolation Forest:
+  Training FP Rate: 10.05%
+  Test FP Rate:     9.50%
+
+
+======================================================================
+RECOMMENDED (Best Test Performance): core_8
+======================================================================
