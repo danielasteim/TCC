@@ -361,6 +361,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     
     # Try to load model, fall back to dummy mode if not found
-    app = ProductionCaptchaSVM(root, model_dir='models/all_features')
+    app = ProductionCaptchaSVM(root, model_dir='models/')
     
     root.mainloop()

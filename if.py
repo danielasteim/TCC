@@ -16,7 +16,7 @@ class ProductionCaptchaIF:
     BLUE THEME - for easy visual identification
     """
     
-    def __init__(self, root, model_dir='models/kinematic_geometric_11'):
+    def __init__(self, root, model_dir='models/'):
         self.root = root
         self.root.title("CAPTCHA Verification - Isolation Forest")
         self.root.geometry("500x450")
@@ -361,6 +361,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     
     # Try to load model, fall back to dummy mode if not found
-    app = ProductionCaptchaIF(root, model_dir='models/all_features')
+    app = ProductionCaptchaIF(root, model_dir='models/')
     
     root.mainloop()

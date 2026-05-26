@@ -1,3 +1,19 @@
+"""
+data_collection.py
+
+Janela de coleta de dados comportamentais (movimentação do mouse) em 
+um sistema CAPTCHA para futuro treinamento de dois modelos.
+
+Inicialmente a ideia era coletar de vários usuários, por isso as descrições em inglês
+No entanto por ética de dados, não será utilizado coleta de usuários externos
+
+Uso:
+    python data_collection.py
+
+Dependências:
+    pip install numpy tkinter
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import time
@@ -16,7 +32,7 @@ class Captcha:
         self.root.title("Behavioral CAPTCHA")
         self.root.configure(bg='#f0f0f0')
 
-        # Session data storage
+        # Dados dasessão
         self.session_data = {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
             'session_user': [],
@@ -29,7 +45,7 @@ class Captcha:
             'distance_traveled': 0
         }
 
-        # Record session user
+        # Recorda sessão do usuário
         name = simpledialog.askstring(
             title="Identificação",
             prompt="Digite seu nome e último sobrenome:",
@@ -42,7 +58,7 @@ class Captcha:
 
         print(self.session_data["session_user"])
 
-        # Tracking variables
+        # Variaveis
         self.start_time = time.time()
         self.last_position = None
         self.last_time = time.time()
@@ -50,29 +66,22 @@ class Captcha:
         self.checkbox_checked = False
         self.sessions_count = 1
 
-        # Recent positions for acceleration calculation
         self.recent_positions = deque(maxlen=6)
 
-        # Position window randomly on first launch
         self._randomize_window_position()
 
         self.setup_ui()
 
         print("CAPTCHA initialized | CAPTCHA iniciado")
 
-    # ------------------------------------------------------------------
-    # Window positioning
-    # ------------------------------------------------------------------
-
     def _randomize_window_position(self):
         """Place the window at a random position on the screen.
         
-        The window is kept fully visible by clamping the chosen (x, y)
-        so it never goes beyond the screen boundaries.
+        Posiciona a janela da aplicação em um local aleatório da tela
         """
         WIN_W, WIN_H = 500, 400
 
-        # Force Tk to compute screen dimensions before we query them
+        # Dimensões da tela
         self.root.update_idletasks()
 
         screen_w = self.root.winfo_screenwidth()
@@ -86,8 +95,7 @@ class Captcha:
 
         self.root.geometry(f"{WIN_W}x{WIN_H}+{rand_x}+{rand_y}")
 
-        # Store the window origin so click positions can be saved relative
-        # to the screen if needed in the future.
+        # Salva Posição do clique relativo à tela
         self.session_data['window_origin'] = {'x': rand_x, 'y': rand_y}
 
         print(f"Window placed at ({rand_x}, {rand_y}) | "
@@ -103,16 +111,15 @@ class Captcha:
         Realiza a configuração da interface incluindo titulo, frames, checkbox, icone e status da verificação.
         """
 
-        # Destroy any widgets that were created in a previous session so
-        # we don't stack duplicate frames on reset.
+
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        # Main frame
+        # Janela
         main_frame = tk.Frame(self.root, bg='#ffffff', relief=tk.RAISED, borderwidth=2)
         main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=250)
 
-        # Title
+        # Titulo
         title_label = tk.Label(
             main_frame,
             text="Verifique se é humano",
@@ -122,11 +129,10 @@ class Captcha:
         )
         title_label.pack(pady=20)
 
-        # Checkbox frame
+        # Checkbox fram
         checkbox_frame = tk.Frame(main_frame, bg='#ffffff', relief=tk.GROOVE, borderwidth=2)
         checkbox_frame.pack(pady=30, padx=40, fill='x')
 
-        # Custom checkbox
         self.checkbox_var = tk.BooleanVar()
         self.checkbox = tk.Checkbutton(
             checkbox_frame,
@@ -139,7 +145,7 @@ class Captcha:
         )
         self.checkbox.pack(side='left', padx=10, pady=15)
 
-        # Icon placeholder
+        # Icone
         icon_label = tk.Label(
             checkbox_frame,
             text="👻",
@@ -148,7 +154,7 @@ class Captcha:
         )
         icon_label.pack(side='right', padx=10)
 
-        # Status label
+        # Status da interação
         self.status_label = tk.Label(
             main_frame,
             text="Mova seu mouse e clique na checkbox para verificar sua autenticidade",
@@ -158,7 +164,7 @@ class Captcha:
         )
         self.status_label.pack(pady=10)
 
-        # Movement counter
+        # Counter de movimentos
         self.counter_label = tk.Label(
             main_frame,
             text="Movimentos: 0",
@@ -168,12 +174,8 @@ class Captcha:
         )
         self.counter_label.pack(pady=2)
 
-        # Bind mouse events to the entire window
         self.root.bind('<Motion>', self.track_mouse_movement)
 
-    # ------------------------------------------------------------------
-    # Tracking
-    # ------------------------------------------------------------------
 
     def track_mouse_movement(self, event):
         """Track mouse movements and calculate behavioral metrics.
@@ -186,14 +188,13 @@ class Captcha:
         current_time = time.time()
         current_pos = (event.x, event.y)
 
-        # Initialize first position
         if self.last_position is None:
             self.last_position = current_pos
             self.last_time = current_time
             self.recent_positions.append((current_pos, current_time))
             return
 
-        # Record position and timestamp
+        # Posição e timestamp
         self.session_data['mouse_movements'].append({
             'x': event.x,
             'y': event.y,
@@ -201,18 +202,18 @@ class Captcha:
         })
         self.session_data['timestamps'].append(current_time)
 
-        # Update counter
+        # Atualiza contador
         self.counter_label.config(
             text=f"Movements: {len(self.session_data['mouse_movements'])}"
         )
 
-        # Distance dx dy
+        # Distancia dx dy
         dx = current_pos[0] - self.last_position[0]
         dy = current_pos[1] - self.last_position[1]
         distance = math.sqrt(dx**2 + dy**2)
         self.session_data['distance_traveled'] += distance
 
-        # Velocity and Acceleration
+        # Velocidade e aceleração
         time_delta = current_time - self.last_time
         if time_delta > 0:
             velocity = distance / time_delta
@@ -259,9 +260,6 @@ class Captcha:
 
         return 0
 
-    # ------------------------------------------------------------------
-    # Events
-    # ------------------------------------------------------------------
 
     def on_checkbox_click(self):
         """Handle checkbox click event | Evento de clique do checkbox."""
@@ -292,9 +290,6 @@ class Captcha:
             )
             self.is_tracking = True
 
-    # ------------------------------------------------------------------
-    # Data persistence
-    # ------------------------------------------------------------------
 
     def submit_data(self):
         """Save session data and show results | Salvar os dados da sessão."""
@@ -352,10 +347,6 @@ class Captcha:
             'time_to_click': self.session_data['click_data'].get('time_to_click', 0)
         }
 
-    # ------------------------------------------------------------------
-    # Session reset
-    # ------------------------------------------------------------------
-
     def reset_session(self):
         """Reset for new session | Resetar para nova sessão."""
         print("\n" + "=" * 50)
@@ -371,7 +362,7 @@ class Captcha:
 
         self.session_data = {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
-            'session_user': self.session_data["session_user"],  # keep the same user
+            'session_user': self.session_data["session_user"], 
             'mouse_movements': [],
             'timestamps': [],
             'velocities': [],
@@ -381,15 +372,13 @@ class Captcha:
             'distance_traveled': 0
         }
 
-        # Reposition window randomly before rebuilding the UI
+        # Gera a UI em um local aleatório da tela
         self._randomize_window_position()
 
         self.setup_ui()
 
 
-# ----------------------------------------------------------------------
-# Entry point
-# ----------------------------------------------------------------------
+
 
 if __name__ == "__main__":
     print("=" * 50)

@@ -548,8 +548,8 @@ if __name__ == "__main__":
     
     simulator = BotSimulator()
     
-    print("\nMake sure you have trained models in 'models/core_8/'")
+    print("\nMake sure you have trained models in 'models/'")
     input("Press Enter to start testing...")
     
     # Run all tests
-    simulator.run_all_tests(model_dir='models/all_features')
+    simulator.run_all_tests(model_dir='models/')
