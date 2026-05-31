@@ -1,11 +1,13 @@
 """
 captcha_feature_pipeline.py
-
+============================
 Pipeline de extração e normalização de features comportamentais
 de sessões de mouse coletadas em CAPTCHA.
 
 Lê todos os arquivos .json da pasta  captcha_data/  e gera:
-  - dataset.csv          → features normalizadas (entrada do modelo ML)
+  - dataset.csv          → features normalizadas por z-score (entrada do modelo ML)
+  - dataset_raw.csv      → features brutas (para análise e debugging)
+  - dataset_normstats.csv → média e desvio padrão de cada feature (para inferência)
 
 Uso:
     python captcha_feature_pipeline.py
