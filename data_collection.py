@@ -101,9 +101,7 @@ class Captcha:
         print(f"Window placed at ({rand_x}, {rand_y}) | "
               f"Janela posicionada em ({rand_x}, {rand_y})")
 
-    # ------------------------------------------------------------------
-    # UI
-    # ------------------------------------------------------------------
+
 
     def setup_ui(self):
         """Sets up the UI environment including title, frames, checkbox, icon and status of verification.
