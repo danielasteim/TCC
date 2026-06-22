@@ -1,36 +1,3 @@
-"""
-feature_processor.py
-
-Classe de pré-processamento para o CAPTCHA comportamental baseado em
-dinâmica de mouse (Isolation Forest + One-Class SVM).
-
-Responsabilidades:
-  1. Normalizar todas as grandezas com dimensão espacial de uma sessão
-     (posição, velocidade, aceleração, distância percorrida e posição
-     de clique) pela diagonal da resolução da janela daquela sessão —
-     tornando-as adimensionais e comparáveis entre sessões capturadas
-     em dispositivos com resoluções diferentes.
-  2. Extrair, a partir da sessão normalizada, um vetor de features —
-     pronto para alimentar `.fit()` / `.predict()` do scikit-learn.
-
-Organização das features:
-  Cada feature é calculada por um método próprio, com prefixo
-  `_feature_`, que recebe a sessão JÁ NORMALIZADA e devolve um valor
-  escalar. O método `extract_features` funciona como o "main" desse
-  processo: chama cada um dos métodos de feature já implementados e
-  monta o vetor final.
-
-  Para adicionar uma nova feature:
-    1. Implemente um método `_feature_<nome>(self, session)`.
-    2. Adicione a linha correspondente dentro de `extract_features`.
-
-A mesma classe é usada em dois momentos:
-  - Offline, para montar o dataset de treino a partir das sessões já
-    capturadas (transform_batch / transform_batch_from_dir).
-  - Online, em produção, para pré-processar UMA sessão recém-capturada
-    antes de pontuá-la com os modelos já treinados (transform).
-"""
-
 import json
 import math
 from pathlib import Path
@@ -48,10 +15,11 @@ class Features:
         self.eps = eps
 
     # Normalização  pela diagonal da janela
+    WINDOW_WIDTH = 500
+    WINDOW_HEIGHT = 400
+
     def _compute_diagonal(self, session: dict) -> float:
-        width = session["window_origin"]["x"]
-        height = session["window_origin"]["y"]
-        diagonal = math.hypot(width, height)
+        diagonal = math.hypot(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         return diagonal if diagonal > self.eps else self.eps
 
     def normalize_session(self, session: dict) -> dict:
@@ -69,7 +37,7 @@ class Features:
         Grandezas temporais (timestamps, total_time, time_to_click, num_movements) NÃO são alteradas
         """
         diagonal = self._compute_diagonal(session)
-        s = json.loads(json.dumps(session))  # deep copy simples (dict só com tipos básicos)
+        s = json.loads(json.dumps(session))  
 
         for m in s.get("mouse_movements", []):
             m["x"] = m["x"] / diagonal
@@ -111,10 +79,7 @@ class Features:
 
     def _feature_straightness_ratio(self, session: dict) -> float:
         """
-        Distância em linha reta entre o primeiro e o último ponto do
-        trajeto, dividida pela distância total percorrida. É a razão
-        entre duas grandezas já normalizadas, então o resultado já é
-        adimensional por construção. 1.0 = caminho perfeitamente reto;
+        1.0 = caminho perfeitamente reto;
         valores baixos = caminho tortuoso.
         """
         movements = session.get("mouse_movements", [])
@@ -175,6 +140,33 @@ class Features:
         if timestamps.size < 2:
             return 0.0
         return float(np.std(np.diff(timestamps)))
+    
+    def _jerk(self, session: dict) -> np.ndarray:
+
+        accelerations = np.asarray(session.get("accelerations", []), dtype=float)
+        timestamps = np.asarray(session.get("timestamps", []), dtype=float)
+
+        if accelerations.size < 2 or timestamps.size < accelerations.size + 1:
+            return np.array([])
+
+        accel_times = timestamps[1: 1 + accelerations.size]
+        delta_a = np.diff(accelerations)
+        delta_t = np.diff(accel_times)
+
+        delta_t = np.where(np.abs(delta_t) < self.eps, self.eps, delta_t)
+
+        jerk = delta_a / delta_t
+        return np.abs(jerk)
+
+
+    def _feature_jerk_mean(self, session: dict) -> float:
+        jerk = self._jerk(session)
+        return float(np.mean(jerk)) if jerk.size else 0.0
+
+
+    def _feature_jerk_std(self, session: dict) -> float:
+        jerk = self._jerk(session)
+        return float(np.std(jerk)) if jerk.size else 0.0
 
     # Orquestrador
     def extract_features(self, normalized_session: dict) -> dict:
@@ -183,21 +175,10 @@ class Features:
         vetor de features final
         """
         return {
-            "num_movements": self._feature_num_movements(normalized_session),
-            "total_time": self._feature_total_time(normalized_session),
-            "time_to_click": self._feature_time_to_click(normalized_session),
-            "total_distance_norm": self._feature_total_distance_norm(normalized_session),
-            "straightness_ratio": self._feature_straightness_ratio(normalized_session),
-            "avg_velocity_norm": self._feature_avg_velocity_norm(normalized_session),
-            "std_velocity_norm": self._feature_std_velocity_norm(normalized_session),
-            "max_velocity_norm": self._feature_max_velocity_norm(normalized_session),
-            "avg_acceleration_norm": self._feature_avg_acceleration_norm(normalized_session),
-            "std_acceleration_norm": self._feature_std_acceleration_norm(normalized_session),
-            "max_acceleration_norm": self._feature_max_acceleration_norm(normalized_session),
-            "click_offset_norm": self._feature_click_offset_norm(normalized_session),
-            "avg_time_between_movements": self._feature_avg_time_between_movements(normalized_session),
-            "std_time_between_movements": self._feature_std_time_between_movements(normalized_session),
+            "jerk_mean": self._feature_jerk_mean(normalized_session),
+            "jerk_std": self._feature_jerk_std(normalized_session),
         }
+
 
 
     # Pipeline completa
@@ -205,9 +186,6 @@ class Features:
         """
         Pipeline completo para UMA sessão: normaliza + extrai features.
         Retorna um pandas.Series de uma linha.
-
-        Use este método tanto para montar o dataset de treino quanto,
-        em produção, para pontuar uma sessão real no momento do CAPTCHA.
         """
         normalized = self.normalize_session(session)
         features = self.extract_features(normalized)
@@ -222,8 +200,7 @@ class Features:
         """
         Lê todos os arquivos .json de sessão de um diretório, aplica o
         pipeline completo e retorna um DataFrame (uma linha por sessão,
-        com a coluna 'session_id' na frente). Pensado para montar o
-        dataset de treino a partir das sessões já capturadas.
+        com a coluna 'session_id' na frente).
         """
         sessions, session_ids = [], []
         for path in sorted(Path(directory).glob(pattern)):
@@ -235,3 +212,49 @@ class Features:
         df = self.transform_batch(sessions)
         df.insert(0, "session_id", session_ids)
         return df
+
+
+if __name__ == "__main__":
+    """
+    Uso:
+        python feature_processor.py caminho/da/sessao.json
+        python feature_processor.py caminho/da/pasta_com_sessoes/
+
+    Se receber um arquivo único: mostra o vetor de features dessa sessão.
+    Se receber uma pasta: roda em todas as sessões, mostra quantas
+    processaram sem erro e quais falharam (se alguma falhar).
+    """
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Uso: python feature_processor.py <arquivo.json | pasta/>")
+        sys.exit(1)
+
+    target = Path(sys.argv[1])
+    fp = Features()
+
+    if target.is_dir():
+        ok, errors = 0, []
+        rows = []
+        for path in sorted(target.glob("*.json")):
+            with open(path, "r", encoding="utf-8") as f:
+                session = json.load(f)
+            try:
+                rows.append(fp.transform(session))
+                ok += 1
+            except Exception as e:
+                errors.append((path.name, str(e)))
+
+        print(f"Processadas com sucesso: {ok}")
+        print(f"Erros: {len(errors)}")
+        for name, err in errors[:10]:
+            print(f"  {name} -> {err}")
+
+        if rows:
+            df = pd.DataFrame(rows)
+            print()
+            print(df.describe())
+    else:
+        with open(target, "r", encoding="utf-8") as f:
+            session = json.load(f)
+        print(fp.transform(session))
