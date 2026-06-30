@@ -56,7 +56,7 @@ class CaptchaFlorestaIsolacao:
         self.modelo = joblib.load(DIR_MODELOS / self.ARQUIVO_MODELO)
         self.colunas_features = joblib.load(DIR_MODELOS / "colunas_features.joblib")
 
-        # --- Dados da sessão (mesma winsoestrutura de data_collection.py) ---
+        # --- Dados da sessão (mesma estrutura de data_collection.py) ---
         self.session_data = {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
             'session_user': ['TESTE_AUTENTICACAO'],
