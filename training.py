@@ -100,6 +100,7 @@ def treinar(dir_dados: str, dir_saida: str) -> None:
     joblib.dump(floresta_isolacao, caminho_saida / "floresta_isolacao.joblib")
     joblib.dump(COLUNAS_FEATURES, caminho_saida / "colunas_features.joblib")
 
+
     print()
     print(f"Modelos salvos em '{caminho_saida}/':")
     for nome_arquivo in ["winsorizador.joblib", "escalonador.joblib", "svm_uma_classe.joblib",
@@ -113,6 +114,8 @@ def treinar(dir_dados: str, dir_saida: str) -> None:
     print(f"Tempo de treino - SVM de Uma Classe: {tempo_svm:.2f}s")
     print(f"Tempo de treino - Floresta de Isolação: {tempo_floresta:.2f}s")
 
+    return tempo_svm, tempo_floresta
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Treina os modelos SVM de Uma Classe e Floresta de Isolação.")
@@ -120,4 +123,20 @@ if __name__ == "__main__":
     parser.add_argument("--dir-saida", default="modelos", help="Diretório de saída dos modelos treinados")
     args = parser.parse_args()
 
-    treinar(args.dir_dados, args.dir_saida)
+    tempos_svm = []
+    tempos_floresta = []
+
+    for _ in range(30):  # repete 30 vezes para medir tempo médio de treino
+        print(f"\nTreinamento {_ + 1}/30")
+        tempo_svm, tempo_floresta = treinar(args.dir_dados, args.dir_saida)
+        tempos_svm.append(tempo_svm)
+        tempos_floresta.append(tempo_floresta)
+
+    print("\nResumo dos tempos de treino (30 execuções):")
+    print(f"  SVM de Uma Classe: {sum(tempos_svm) / len(tempos_svm):.2f}s em média")
+    print(f"  Floresta de Isolação: {sum(tempos_floresta) / len(tempos_floresta):.2f}s em média")
+
+    print(f"\nVetor SVM: {tempos_svm}")
+    print(f"Vetor Floresta de Isolação: {tempos_floresta}")
+
+    
