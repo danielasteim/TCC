@@ -49,10 +49,10 @@ import numpy as np
 
 
 VERSAO_COLETOR = 3
-PASTA_SAIDA = 'captcha_data_v3'
+PASTA_SAIDA = 'captcha_data_f'
 
 # Intervalo entre o clique e o início da próxima sessão
-PAUSA_ENTRE_SESSOES_MS = 1000
+PAUSA_ENTRE_SESSOES_MS = 500
 
 # Tamanho do painel que contém o checkbox
 LARGURA_PAINEL, ALTURA_PAINEL = 400, 250
@@ -390,6 +390,8 @@ class Captcha:
 
     def submit_data(self):
         """Save session data and show results | Salvar os dados da sessão."""
+        self._separar_eventos_apos_clique()
+
         if len(self.session_data['mouse_movements']) < 5:
             self.status_label.config(
                 text="Movimento insuficiente: mova o mouse e clique de novo", fg='#ff6666'
@@ -421,6 +423,30 @@ class Captcha:
         self.checkbox.config(state='disabled')
         self.sessions_count += 1
         self.root.after(PAUSA_ENTRE_SESSOES_MS, self.reset_session)
+
+    def _separar_eventos_apos_clique(self):
+        """
+        O clique é registrado ao pressionar o botão, mas o checkbox só confirma
+        ao soltar (~100 ms depois); movimentos nesse intervalo não fazem parte
+        da trajetória até o alvo. Move-os para 'movements_after_click' e
+        recalcula a distância percorrida só com a trajetória até o clique.
+        """
+        instante_clique = self.session_data['click_data']['click_timestamp']
+        timestamps = self.session_data['timestamps']
+        corte = sum(1 for t in timestamps if t <= instante_clique)
+
+        movimentos = self.session_data['mouse_movements']
+        self.session_data['movements_after_click'] = [
+            dict(m, timestamp=t) for m, t in zip(movimentos[corte:], timestamps[corte:])
+        ]
+        self.session_data['mouse_movements'] = movimentos[:corte]
+        self.session_data['timestamps'] = timestamps[:corte]
+
+        pontos = self.session_data['mouse_movements']
+        self.session_data['distance_traveled'] = sum(
+            math.hypot(pontos[i]['x'] - pontos[i - 1]['x'], pontos[i]['y'] - pontos[i - 1]['y'])
+            for i in range(1, len(pontos))
+        )
 
     def calculate_metrics(self):
         """Calculate summary metrics from session data | Calcular as métricas da sessão."""

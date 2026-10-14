@@ -18,7 +18,9 @@ Ajustes já identificados no texto do TCC. Marcar ao resolver no `.tex`.
 - [ ] Primeiro evento de movimento incluído na sessão.
 - [ ] Alvo = apenas o quadrado do checkbox (≈ 27 × 22 px); o texto "Autenticação" é um rótulo não clicável. Atualizar $W$ da Lei de Fitts, se citado.
 - [ ] Fluxo automático: após o clique, a sessão é salva e a próxima começa 1 s depois, com o painel em nova posição, sem diálogos. A trajetória seguinte parte de onde o cursor parou (o ponto do clique anterior), o que define a distribuição de $P_0$.
-- [ ] Versões da coleta: v1 (`captcha_data/`, erro de coordenadas, 10.175 sessões), v2 (`captcha_data_v2/`, piloto de 80 sessões com o texto clicável), v3 (`captcha_data_v3/`, base final).
+- [ ] Versões da coleta: v1 (`captcha_data/`, erro de coordenadas, 10.175 sessões), v2 (piloto de 80 sessões com o texto clicável, descartado), v3 (`captcha_data_f/`, base final).
+- [ ] O clique é o instante em que o botão é pressionado; movimentos entre pressionar e soltar (~100 ms, até ~12 px, dentro do alvo) não fazem parte da trajetória e são separados em `movements_after_click`.
+- [ ] Taxa de amostragem do mouse: Δt mediano de 8 ms (≈ 125 Hz). Citar ao descrever o dispositivo e ao justificar o Δt do nível T0.
 - [ ] Justificar a recoleta: o coletor v1 registrava as coordenadas no referencial do elemento sob o cursor (checkbox, moldura, painel), gerando saltos de 50–100 px sem movimento real em ~92% das sessões e invalidando `dist_clique`. Evidência: cursor em linha reta horizontal (y = 206) gravado como y ∈ {14, 31, 131}.
 - [ ] Número de sessões e participantes da coleta v2 `[preencher]`.
 

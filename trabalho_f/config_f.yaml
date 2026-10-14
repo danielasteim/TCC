@@ -5,8 +5,7 @@
 semente: 42
 
 caminhos:
-  humanos: captcha_data_v3              # sessões humanas do coletor v3 (somente leitura)
-  humanos_v2_piloto: captcha_data_v2    # piloto: alvo incluía o texto "Autenticação"
+  humanos: captcha_data_f               # sessões humanas do coletor v3 (somente leitura)
   humanos_v1: captcha_data              # coletor v1 (erro de coordenadas), só referência
   bots_trajetorias: trabalho_f/dados/bot/trajetorias
   bots_sessoes: trabalho_f/dados/bot/sessoes

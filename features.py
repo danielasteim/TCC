@@ -98,6 +98,31 @@ class Features:
             return target["center_x"], target["center_y"], target["width"]
         return self.CHECKBOX_CENTER_X, self.CHECKBOX_CENTER_Y, self.CHECKBOX_WIDTH
 
+    def _cortar_eventos_apos_clique(self, s: dict) -> None:
+        """
+        Remove (na cópia `s`) os eventos de movimento posteriores ao clique.
+        No coletor v3 o clique é gravado ao pressionar o botão, mas a sessão
+        só fecha ao soltar; sessões coletadas antes da correção têm alguns
+        eventos nesse intervalo. Quando há corte, a distância percorrida é
+        recalculada a partir dos pontos restantes. Sessões sem eventos após
+        o clique (todas as da v1) não são alteradas.
+        """
+        instante_clique = s.get("click_data", {}).get("click_timestamp")
+        timestamps = s.get("timestamps", [])
+        movimentos = s.get("mouse_movements", [])
+        if instante_clique is None or len(timestamps) != len(movimentos):
+            return
+        corte = sum(1 for t in timestamps if t <= instante_clique)
+        if corte == len(timestamps):
+            return
+        s["mouse_movements"] = movimentos[:corte]
+        s["timestamps"] = timestamps[:corte]
+        pontos = s["mouse_movements"]
+        s["distance_traveled"] = sum(
+            math.hypot(pontos[i]["x"] - pontos[i - 1]["x"], pontos[i]["y"] - pontos[i - 1]["y"])
+            for i in range(1, len(pontos))
+        )
+
     def normalize_session(self, session: dict) -> dict:
         """
         Retorna uma CÓPIA da sessão com todas as grandezas espaciais
@@ -116,6 +141,7 @@ class Features:
         """
         diagonal = self._compute_diagonal(session)
         s = json.loads(json.dumps(session))  # deep copy simples (dict só com tipos básicos)
+        self._cortar_eventos_apos_clique(s)
 
         for m in s.get("mouse_movements", []):
             m["x"] = m["x"] / diagonal
