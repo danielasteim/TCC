@@ -79,8 +79,24 @@ class Features:
     CHECKBOX_WIDTH = 136.0
 
     def _compute_diagonal(self, session: dict) -> float:
-        diagonal = math.hypot(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        # Coletor v2 (tela cheia) salva o tamanho real da janela por sessão;
+        # sessões v1 caem nas constantes da janela 500x400.
+        window_size = session.get("window_size", {})
+        width = window_size.get("width", self.WINDOW_WIDTH)
+        height = window_size.get("height", self.WINDOW_HEIGHT)
+        diagonal = math.hypot(width, height)
         return diagonal if diagonal > self.eps else self.eps
+
+    def _target_geometry(self, session: dict):
+        """
+        Retorna (centro_x, centro_y, largura) do checkbox-alvo, em pixels.
+        Coletor v2 sorteia a posição do alvo e salva em session['target'];
+        sessões v1 usam as constantes medidas do layout fixo.
+        """
+        target = session.get("target")
+        if target:
+            return target["center_x"], target["center_y"], target["width"]
+        return self.CHECKBOX_CENTER_X, self.CHECKBOX_CENTER_Y, self.CHECKBOX_WIDTH
 
     def normalize_session(self, session: dict) -> dict:
         """
@@ -223,8 +239,9 @@ class Features:
         if click_pos is None:
             return 0.0
         diagonal = self._compute_diagonal(session)
-        center_x_norm = self.CHECKBOX_CENTER_X / diagonal
-        center_y_norm = self.CHECKBOX_CENTER_Y / diagonal
+        center_x, center_y, _ = self._target_geometry(session)
+        center_x_norm = center_x / diagonal
+        center_y_norm = center_y / diagonal
         return math.hypot(click_pos[0] - center_x_norm, click_pos[1] - center_y_norm)
 
     def _feature_reaction_time_fitts_residual(self, session: dict) -> float:
@@ -245,9 +262,10 @@ class Features:
             return time_to_click
 
         diagonal = self._compute_diagonal(session)
-        center_x_norm = self.CHECKBOX_CENTER_X / diagonal
-        center_y_norm = self.CHECKBOX_CENTER_Y / diagonal
-        width_norm = self.CHECKBOX_WIDTH / diagonal
+        center_x, center_y, width = self._target_geometry(session)
+        center_x_norm = center_x / diagonal
+        center_y_norm = center_y / diagonal
+        width_norm = width / diagonal
 
         x0, y0 = movements[0]["x"], movements[0]["y"]
         d = math.hypot(x0 - center_x_norm, y0 - center_y_norm)
@@ -523,8 +541,9 @@ class Features:
         if click_pos is None:
             return 0.0
         diagonal = self._compute_diagonal(session)
-        center_x_norm = self.CHECKBOX_CENTER_X / diagonal
-        center_y_norm = self.CHECKBOX_CENTER_Y / diagonal
+        center_x, center_y, _ = self._target_geometry(session)
+        center_x_norm = center_x / diagonal
+        center_y_norm = center_y / diagonal
         return math.hypot(click_pos[0] - center_x_norm, click_pos[1] - center_y_norm)
 
     def _feature_vel_aproximacao(self, session: dict) -> float:
