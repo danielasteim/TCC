@@ -124,7 +124,7 @@ def ajustar_exponencial(s: np.ndarray, z: np.ndarray, grade_b: np.ndarray):
 
 
 # ----------------------------------------------------------------------
-# Amostragem dos parâmetros a partir de results/params_humanos.json
+# Amostragem dos parâmetros a partir de trabalho_f/resultados/params_humanos.json
 # ----------------------------------------------------------------------
 class AmostradorParametros:
     """Sorteia P0, alvo, deslocamento do clique, M, a e b das distribuições humanas."""

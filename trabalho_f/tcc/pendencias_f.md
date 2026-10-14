@@ -16,6 +16,9 @@ Ajustes já identificados no texto do TCC. Marcar ao resolver no `.tex`.
 - [ ] Interface passa a ser **tela cheia**, com o painel do checkbox (400 × 250 px) em posição aleatória a cada sessão (no lugar da janela 500 × 400 em posição aleatória).
 - [ ] Coordenadas de movimento e de clique no referencial da janela (`x_root − origem da janela`); clique registrado no pressionamento do botão sobre o checkbox.
 - [ ] Primeiro evento de movimento incluído na sessão.
+- [ ] Alvo = apenas o quadrado do checkbox (≈ 27 × 22 px); o texto "Autenticação" é um rótulo não clicável. Atualizar $W$ da Lei de Fitts, se citado.
+- [ ] Fluxo automático: após o clique, a sessão é salva e a próxima começa 1 s depois, com o painel em nova posição, sem diálogos. A trajetória seguinte parte de onde o cursor parou (o ponto do clique anterior), o que define a distribuição de $P_0$.
+- [ ] Versões da coleta: v1 (`captcha_data/`, erro de coordenadas, 10.175 sessões), v2 (`captcha_data_v2/`, piloto de 80 sessões com o texto clicável), v3 (`captcha_data_v3/`, base final).
 - [ ] Justificar a recoleta: o coletor v1 registrava as coordenadas no referencial do elemento sob o cursor (checkbox, moldura, painel), gerando saltos de 50–100 px sem movimento real em ~92% das sessões e invalidando `dist_clique`. Evidência: cursor em linha reta horizontal (y = 206) gravado como y ∈ {14, 31, 131}.
 - [ ] Número de sessões e participantes da coleta v2 `[preencher]`.
 
@@ -31,4 +34,5 @@ Ajustes já identificados no texto do TCC. Marcar ao resolver no `.tex`.
 - [ ] $M$: Acien et al. condicionam $M$ à **direção** (8 trajetórias); o gerador usa direção (8 setores) × faixa de comprimento (tercis de $L$). Descrever assim.
 - [ ] $a$ e $b$ da exponencial são sorteados como par (da mesma trajetória humana), dentro dos percentis 5–95 de cada um.
 - [ ] Perfil "constante" espaça os pontos uniformemente ao longo do segmento $P_0 \to P_c$ (como Acien, que espaça $x$), e não ao longo do arco: em formas muito curvas, a distância entre pontos varia. Decidir se mantém (fiel ao artigo) ou se reparametriza por comprimento de arco.
-- [ ] $P_0$ dos humanos v2 é onde o cursor estava ao abrir a sessão (em geral, perto do botão do diálogo "Nova sessão?"). Descrever ao apresentar a distribuição de $P_0$.
+- [ ] $P_0$ dos humanos v3 é onde o cursor estava ao abrir a sessão (o ponto do clique anterior). Descrever ao apresentar a distribuição de $P_0$.
+- [ ] Expoente $b$ da exponencial bate nos limites da grade de busca (±8) nos percentis 5 e 95; revisar a grade com os dados v3 antes de fixar a faixa no texto.

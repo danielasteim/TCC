@@ -1,17 +1,19 @@
 # Configuração única dos experimentos do TCC.
-# Todos os scripts em scripts/ leem este arquivo via scripts/common_f.py.
+# Todos os scripts em trabalho_f/scripts/ leem este arquivo via common_f.py.
+# Caminhos relativos à pasta do TCC.
 
 semente: 42
 
 caminhos:
-  humanos: captcha_data_v2        # sessões humanas do coletor v2 (somente leitura)
-  humanos_v1: captcha_data        # sessões do coletor v1, só para referência
-  bots_trajetorias: data/bot/traj
-  bots_sessoes: data/bot/sessions
-  resultados: results
-  tabelas: results/tables
-  figuras: results/figures
-  modelos: models
+  humanos: captcha_data_v3              # sessões humanas do coletor v3 (somente leitura)
+  humanos_v2_piloto: captcha_data_v2    # piloto: alvo incluía o texto "Autenticação"
+  humanos_v1: captcha_data              # coletor v1 (erro de coordenadas), só referência
+  bots_trajetorias: trabalho_f/dados/bot/trajetorias
+  bots_sessoes: trabalho_f/dados/bot/sessoes
+  resultados: trabalho_f/resultados
+  tabelas: trabalho_f/resultados/tabelas
+  figuras: trabalho_f/resultados/figuras
+  modelos: trabalho_f/modelos
 
 # Pré-processamento e modelos (iguais aos do training.py)
 winsorizacao: [0.005, 0.995]
@@ -25,7 +27,7 @@ floresta:
   max_samples: 1.0
   contamination: auto
 
-# Estimação dos parâmetros nos humanos (scripts/00_estimate_params_f.py)
+# Estimação dos parâmetros nos humanos (00_estimar_parametros_f.py)
 estimacao:
   L_minimo_ajuste: 50        # px; trajetórias mais curtas não entram no ajuste das formas
   n_direcoes: 8              # setores de direção para M (como em Acien et al., 2022)
@@ -34,7 +36,7 @@ estimacao:
   grade_b: [-8.0, 8.0, 0.25] # busca do expoente b da forma exponencial
   percentis_parametros: [5, 95]
 
-# Gerador de trajetórias (scripts/01_generate_bots_f.py)
+# Gerador de trajetórias (01_gerar_trajetorias_f.py)
 gerador:
   trajetorias_por_familia: 150
   M_minimo: 10

@@ -13,7 +13,9 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-RAIZ = Path(__file__).resolve().parents[1]
+# trabalho_f/scripts/common_f.py -> RAIZ é a pasta do TCC, PASTA_F é trabalho_f/
+PASTA_F = Path(__file__).resolve().parents[1]
+RAIZ = PASTA_F.parent
 # append (e não insert) para que o math.py da raiz não sombreie nada
 sys.path.append(str(RAIZ))
 
@@ -23,13 +25,13 @@ FAMILIAS_FORMA = {0: "linear", 1: "quadratica", 2: "exponencial"}
 FAMILIAS_PERFIL = {0: "constante", 1: "crescente", 2: "gaussiano"}
 
 
-def carregar_config(caminho: Path = RAIZ / "config_f.yaml") -> dict:
+def carregar_config(caminho: Path = PASTA_F / "config_f.yaml") -> dict:
     with open(caminho, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def caminho(config: dict, chave: str) -> Path:
-    """Caminho absoluto de uma entrada de config['caminhos']."""
+    """Caminho absoluto de uma entrada de config['caminhos'] (relativa à pasta do TCC)."""
     return RAIZ / config["caminhos"][chave]
 
 

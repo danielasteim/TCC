@@ -2,7 +2,7 @@
 00_estimar_parametros_f.py
 
 Estima, a partir das sessões humanas, os parâmetros livres do gerador de
-trajetórias (seção 3.5.2) e salva em results/params_humanos.json:
+trajetórias (seção 3.5.2) e salva em trabalho_f/resultados/params_humanos.json:
 
   - P0: posição do primeiro evento, relativa ao tamanho da janela
   - alvo: centro do checkbox, relativo ao tamanho da janela
@@ -17,8 +17,8 @@ Os coeficientes de forma são adimensionais (sistema local s = u/L, z = w/L),
 então valem para qualquer comprimento de trajetória.
 
 Uso:
-    python scripts/00_estimar_parametros_f.py
-    python scripts/00_estimar_parametros_f.py --dir captcha_data --limite 1000   # teste rápido
+    python trabalho_f/scripts/00_estimar_parametros_f.py
+    python trabalho_f/scripts/00_estimar_parametros_f.py --dir captcha_data_v2 --limite 1000   # teste rápido
 """
 
 import argparse

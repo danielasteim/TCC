@@ -2,22 +2,22 @@
 01_gerar_trajetorias_f.py
 
 Gera as trajetórias sintéticas das 9 famílias (3 formas x 3 perfis de
-velocidade) a partir de results/params_humanos.json, e a figura de exemplos.
+velocidade) a partir de trabalho_f/resultados/params_humanos.json, e a figura de exemplos.
 
 Saídas:
-  data/bot/traj/NNNN_shape=A_vp=B.txt   uma linha "x y" por ponto, em pixels
+  trabalho_f/dados/bot/trajetorias/NNNN_shape=A_vp=B.txt   uma linha "x y" por ponto, em pixels
                                         da janela (mesma nomenclatura do
                                         BeCAPTCHA-Mouse)
-  data/bot/traj/indice.csv              parâmetros de cada trajetória (P0, Pc,
+  trabalho_f/dados/bot/trajetorias/indice.csv              parâmetros de cada trajetória (P0, Pc,
                                         centro do alvo, M, a, b, semente)
-  results/figures/gerador_exemplos.pdf/.png
+  trabalho_f/resultados/figuras/gerador_exemplos.pdf/.png
 
 Cada trajetória guarda o centro do alvo usado; o bot de replay posiciona o
 painel do checkbox nesse ponto antes de executar a trajetória.
 
 Uso:
-    python scripts/01_gerar_trajetorias_f.py
-    python scripts/01_gerar_trajetorias_f.py --params results/params_teste_v1.json --n 20
+    python trabalho_f/scripts/01_gerar_trajetorias_f.py
+    python trabalho_f/scripts/01_gerar_trajetorias_f.py --params trabalho_f/resultados/params_teste_v1.json --n 20
 """
 
 import argparse

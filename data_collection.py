@@ -19,6 +19,15 @@ Versão 2 do coletor (VERSAO_COLETOR):
   - Tamanho da janela e geometria do checkbox-alvo são salvos por sessão.
   - As sessões v2 são salvas em captcha_data_v2/, separadas das sessões v1.
 
+Versão 3:
+  - Só o quadrado do checkbox é clicável; o texto "Autenticação" virou um
+    rótulo separado. O alvo (session['target']) é apenas o quadrado.
+  - Fluxo automático: ao clicar no checkbox, a sessão é salva e a próxima
+    começa após PAUSA_ENTRE_SESSOES_MS, com o painel em outra posição. Sem
+    diálogos; a trajetória seguinte parte de onde o cursor parou.
+  - Escala de DPI do Windows salva por sessão.
+  - As sessões v3 são salvas em captcha_data_v3/.
+
 Uso:
     python data_collection.py
     (Esc fecha a aplicação)
@@ -28,7 +37,7 @@ Dependências:
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, simpledialog
 import time
 import json
 import math
@@ -39,13 +48,25 @@ from collections import deque
 import numpy as np
 
 
-VERSAO_COLETOR = 2
-PASTA_SAIDA = 'captcha_data_v2'
+VERSAO_COLETOR = 3
+PASTA_SAIDA = 'captcha_data_v3'
+
+# Intervalo entre o clique e o início da próxima sessão
+PAUSA_ENTRE_SESSOES_MS = 1000
 
 # Tamanho do painel que contém o checkbox
 LARGURA_PAINEL, ALTURA_PAINEL = 400, 250
 # Distância mínima entre o painel e a borda da tela
 MARGEM_PAINEL = 20
+
+
+def _escala_dpi():
+    """Escala de exibição do Windows em % (100 = sem escala); None fora do Windows."""
+    try:
+        import ctypes
+        return ctypes.windll.shcore.GetScaleFactorForDevice(0)
+    except Exception:
+        return None
 
 
 class Captcha:
@@ -151,6 +172,7 @@ class Captcha:
             'height': self.root.winfo_screenheight()
         }
         self.session_data['window_origin'] = {'x': root_x, 'y': root_y}
+        self.session_data['dpi_scale'] = _escala_dpi()
         self.session_data['target'] = {
             'x': cb_x,
             'y': cb_y,
@@ -190,17 +212,28 @@ class Captcha:
         checkbox_frame.pack(pady=30, padx=40, fill='x')
 
         self.checkbox_var = tk.BooleanVar()
+        # Só o quadrado é clicável: Checkbutton sem texto, com rótulo ao lado
         self.checkbox = tk.Checkbutton(
             checkbox_frame,
-            text="  Autenticação",
             variable=self.checkbox_var,
-            font=('Arial', 12),
             bg='#ffffff',
+            activebackground='#ffffff',
+            highlightthickness=0,
+            padx=0,
+            pady=0,
             command=self.on_checkbox_click,
             cursor='hand2'
         )
-        self.checkbox.pack(side='left', padx=10, pady=15)
+        self.checkbox.pack(side='left', padx=(10, 0), pady=15)
         self.checkbox.bind('<ButtonPress-1>', self.ao_pressionar_checkbox)
+
+        checkbox_texto = tk.Label(
+            checkbox_frame,
+            text="Autenticação",
+            font=('Arial', 12),
+            bg='#ffffff'
+        )
+        checkbox_texto.pack(side='left', padx=(4, 0))
 
         # Icone
         icon_label = tk.Label(
@@ -224,7 +257,7 @@ class Captcha:
         # Counter de movimentos
         self.counter_label = tk.Label(
             main_frame,
-            text="Movimentos: 0",
+            text=f"Sessão {self.sessions_count} · Movimentos: 0",
             font=('Arial', 8),
             bg='#ffffff',
             fg='#999999'
@@ -257,7 +290,8 @@ class Captcha:
 
         # Atualiza contador
         self.counter_label.config(
-            text=f"Movimentos: {len(self.session_data['mouse_movements'])}"
+            text=f"Sessão {self.sessions_count} · "
+                 f"Movimentos: {len(self.session_data['mouse_movements'])}"
         )
 
         if self.last_position is None:
@@ -344,9 +378,6 @@ class Captcha:
 
             print("Session data captured | Dados da sessão capturados")
 
-            self.status_label.config(
-                text="✓ Verificação completa, salvando dados...", fg='#4CAF50'
-            )
             self.submit_data()
 
         elif not self.checkbox_var.get():
@@ -360,11 +391,8 @@ class Captcha:
     def submit_data(self):
         """Save session data and show results | Salvar os dados da sessão."""
         if len(self.session_data['mouse_movements']) < 5:
-            messagebox.showwarning(
-                "Insufficient Data | Dados insuficientes",
-                "Not enough mouse movement data captured, click on the window and try again | "
-                "Dados de movimento insuficentes, por favor clique na janela e tente novamente",
-                parent=self.root
+            self.status_label.config(
+                text="Movimento insuficiente: mova o mouse e clique de novo", fg='#ff6666'
             )
             # Desmarca o checkbox e continua registrando na mesma sessão
             self.checkbox_var.set(False)
@@ -386,24 +414,13 @@ class Captcha:
 
         print(f"\nData saved to: {filename}")
 
-        messagebox.showinfo(
-            "Success!",
-            f"Session {self.session_data['session_id']} Data Saved Successfully!",
-            parent=self.root
+        # Próxima sessão automática, sem diálogos (Esc encerra)
+        self.status_label.config(
+            text=f"✓ Sessão {self.sessions_count} salva — a próxima começa em instantes", fg='#4CAF50'
         )
-
-        response = messagebox.askyesno(
-            "New session? | Nova sessão?",
-            f"Would you like to record a new session? | Gostaria de registrar uma nova sessão?\n\n"
-            f"Sessions so far: {self.sessions_count}",
-            parent=self.root
-        )
-
-        if response:
-            self.sessions_count += 1
-            self.reset_session()
-        else:
-            self.root.quit()
+        self.checkbox.config(state='disabled')
+        self.sessions_count += 1
+        self.root.after(PAUSA_ENTRE_SESSOES_MS, self.reset_session)
 
     def calculate_metrics(self):
         """Calculate summary metrics from session data | Calcular as métricas da sessão."""
