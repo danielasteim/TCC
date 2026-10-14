@@ -7,7 +7,7 @@ um sistema CAPTCHA para futuro treinamento de dois modelos.
 Inicialmente a ideia era coletar de vários usuários, por isso as descrições em inglês
 No entanto por ética de dados, não será utilizado coleta de usuários externos
 
-Versão 2 do coletor (COLLECTOR_VERSION):
+Versão 2 do coletor (VERSAO_COLETOR):
   - Janela em tela cheia; o painel com o checkbox é sorteado numa posição
     aleatória da tela a cada sessão (antes era a janela 500x400 que mudava de lugar).
   - Todas as coordenadas (movimentos e clique) estão no referencial da janela,
@@ -39,13 +39,13 @@ from collections import deque
 import numpy as np
 
 
-COLLECTOR_VERSION = 2
-OUTPUT_DIR = 'captcha_data_v2'
+VERSAO_COLETOR = 2
+PASTA_SAIDA = 'captcha_data_v2'
 
 # Tamanho do painel que contém o checkbox
-PANEL_W, PANEL_H = 400, 250
+LARGURA_PAINEL, ALTURA_PAINEL = 400, 250
 # Distância mínima entre o painel e a borda da tela
-PANEL_MARGIN = 20
+MARGEM_PAINEL = 20
 
 
 class Captcha:
@@ -55,7 +55,7 @@ class Captcha:
         self.root.configure(bg='#f0f0f0')
 
         # Dados da sessão
-        self.session_data = self._new_session_data(session_user=[])
+        self.session_data = self._nova_sessao(session_user=[])
 
         # Recorda sessão do usuário
         name = simpledialog.askstring(
@@ -80,7 +80,7 @@ class Captcha:
         self.last_time = time.time()
         self.is_tracking = True
         self.checkbox_checked = False
-        self.press_position = None
+        self.posicao_pressionada = None
         self.sessions_count = 1
 
         self.recent_positions = deque(maxlen=6)
@@ -89,10 +89,10 @@ class Captcha:
 
         print("CAPTCHA initialized | CAPTCHA iniciado")
 
-    def _new_session_data(self, session_user):
+    def _nova_sessao(self, session_user):
         return {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
-            'collector_version': COLLECTOR_VERSION,
+            'collector_version': VERSAO_COLETOR,
             'session_user': session_user,
             'mouse_movements': [],
             'timestamps': [],
@@ -103,7 +103,7 @@ class Captcha:
             'distance_traveled': 0
         }
 
-    def _window_position(self, event):
+    def _posicao_na_janela(self, event):
         """Converts an event position to window coordinates, regardless of the widget under the cursor.
 
         Converte a posição do evento para o referencial da janela,
@@ -112,7 +112,7 @@ class Captcha:
         return (event.x_root - self.root.winfo_rootx(),
                 event.y_root - self.root.winfo_rooty())
 
-    def _random_panel_position(self):
+    def _posicao_aleatoria_painel(self):
         """Pick a random center for the panel, keeping it fully on screen.
 
         Sorteia o centro do painel do checkbox, mantendo-o inteiro na tela.
@@ -120,14 +120,14 @@ class Captcha:
         win_w = self.root.winfo_width()
         win_h = self.root.winfo_height()
 
-        min_x = PANEL_W // 2 + PANEL_MARGIN
-        min_y = PANEL_H // 2 + PANEL_MARGIN
-        max_x = max(min_x, win_w - PANEL_W // 2 - PANEL_MARGIN)
-        max_y = max(min_y, win_h - PANEL_H // 2 - PANEL_MARGIN)
+        min_x = LARGURA_PAINEL // 2 + MARGEM_PAINEL
+        min_y = ALTURA_PAINEL // 2 + MARGEM_PAINEL
+        max_x = max(min_x, win_w - LARGURA_PAINEL // 2 - MARGEM_PAINEL)
+        max_y = max(min_y, win_h - ALTURA_PAINEL // 2 - MARGEM_PAINEL)
 
         return random.randint(min_x, max_x), random.randint(min_y, max_y)
 
-    def _record_geometry(self):
+    def _registrar_geometria(self):
         """Save window size and checkbox geometry, in window coordinates.
 
         Salva o tamanho da janela e a geometria do checkbox-alvo, no
@@ -171,9 +171,9 @@ class Captcha:
             widget.destroy()
 
         # Painel em posição aleatória da tela
-        panel_x, panel_y = self._random_panel_position()
+        panel_x, panel_y = self._posicao_aleatoria_painel()
         main_frame = tk.Frame(self.root, bg='#ffffff', relief=tk.RAISED, borderwidth=2)
-        main_frame.place(x=panel_x, y=panel_y, anchor='center', width=PANEL_W, height=PANEL_H)
+        main_frame.place(x=panel_x, y=panel_y, anchor='center', width=LARGURA_PAINEL, height=ALTURA_PAINEL)
 
         # Titulo
         title_label = tk.Label(
@@ -200,7 +200,7 @@ class Captcha:
             cursor='hand2'
         )
         self.checkbox.pack(side='left', padx=10, pady=15)
-        self.checkbox.bind('<ButtonPress-1>', self.on_checkbox_press)
+        self.checkbox.bind('<ButtonPress-1>', self.ao_pressionar_checkbox)
 
         # Icone
         icon_label = tk.Label(
@@ -231,7 +231,7 @@ class Captcha:
         )
         self.counter_label.pack(pady=2)
 
-        self._record_geometry()
+        self._registrar_geometria()
 
         self.root.bind('<Motion>', self.track_mouse_movement)
 
@@ -245,7 +245,7 @@ class Captcha:
             return
 
         current_time = time.time()
-        current_pos = self._window_position(event)
+        current_pos = self._posicao_na_janela(event)
 
         # Posição e timestamp (inclui o primeiro evento)
         self.session_data['mouse_movements'].append({
@@ -320,10 +320,10 @@ class Captcha:
         return 0
 
 
-    def on_checkbox_press(self, event):
+    def ao_pressionar_checkbox(self, event):
         """Store the real click position | Guarda a posição real do clique."""
-        self.press_position = self._window_position(event)
-        self.press_time = time.time()
+        self.posicao_pressionada = self._posicao_na_janela(event)
+        self.instante_pressionado = time.time()
 
     def on_checkbox_click(self):
         """Handle checkbox click event | Evento de clique do checkbox."""
@@ -332,8 +332,8 @@ class Captcha:
         if not self.checkbox_checked and self.checkbox_var.get():
             self.checkbox_checked = True
             self.is_tracking = False
-            click_time = self.press_time if self.press_position else time.time()
-            click_position = self.press_position or self.last_position or (0, 0)
+            click_time = self.instante_pressionado if self.posicao_pressionada else time.time()
+            click_position = self.posicao_pressionada or self.last_position or (0, 0)
 
             self.session_data['click_data'] = {
                 'time_to_click': click_time - self.start_time,
@@ -369,17 +369,17 @@ class Captcha:
             # Desmarca o checkbox e continua registrando na mesma sessão
             self.checkbox_var.set(False)
             self.checkbox_checked = False
-            self.press_position = None
+            self.posicao_pressionada = None
             self.is_tracking = True
             return
 
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        os.makedirs(PASTA_SAIDA, exist_ok=True)
 
         self.session_data['metrics'] = self.calculate_metrics()
 
         name = self.session_data['session_user'][0].replace(' ', '_')
         filename = (
-            f"{OUTPUT_DIR}/session_{self.session_data['session_id']}_{name}.json"
+            f"{PASTA_SAIDA}/session_{self.session_data['session_id']}_{name}.json"
         )
         with open(filename, 'w') as f:
             json.dump(self.session_data, f, indent=2)
@@ -429,13 +429,13 @@ class Captcha:
 
         self.checkbox_checked = False
         self.is_tracking = True
-        self.press_position = None
+        self.posicao_pressionada = None
         self.start_time = time.time()
         self.last_position = None
         self.last_time = time.time()
         self.recent_positions.clear()
 
-        self.session_data = self._new_session_data(
+        self.session_data = self._nova_sessao(
             session_user=self.session_data["session_user"]
         )
 
@@ -456,6 +456,6 @@ if __name__ == "__main__":
     root.mainloop()
 
     print(
-        f"\nApplication closed. Check the '{OUTPUT_DIR}' folder for saved sessions. | "
-        f"Aplicação fechada, registros salvos em '{OUTPUT_DIR}'"
+        f"\nApplication closed. Check the '{PASTA_SAIDA}' folder for saved sessions. | "
+        f"Aplicação fechada, registros salvos em '{PASTA_SAIDA}'"
     )

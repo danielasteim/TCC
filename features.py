@@ -87,7 +87,7 @@ class Features:
         diagonal = math.hypot(width, height)
         return diagonal if diagonal > self.eps else self.eps
 
-    def _target_geometry(self, session: dict):
+    def _geometria_alvo(self, session: dict):
         """
         Retorna (centro_x, centro_y, largura) do checkbox-alvo, em pixels.
         Coletor v2 sorteia a posição do alvo e salva em session['target'];
@@ -239,7 +239,7 @@ class Features:
         if click_pos is None:
             return 0.0
         diagonal = self._compute_diagonal(session)
-        center_x, center_y, _ = self._target_geometry(session)
+        center_x, center_y, _ = self._geometria_alvo(session)
         center_x_norm = center_x / diagonal
         center_y_norm = center_y / diagonal
         return math.hypot(click_pos[0] - center_x_norm, click_pos[1] - center_y_norm)
@@ -262,7 +262,7 @@ class Features:
             return time_to_click
 
         diagonal = self._compute_diagonal(session)
-        center_x, center_y, width = self._target_geometry(session)
+        center_x, center_y, width = self._geometria_alvo(session)
         center_x_norm = center_x / diagonal
         center_y_norm = center_y / diagonal
         width_norm = width / diagonal
@@ -541,7 +541,7 @@ class Features:
         if click_pos is None:
             return 0.0
         diagonal = self._compute_diagonal(session)
-        center_x, center_y, _ = self._target_geometry(session)
+        center_x, center_y, _ = self._geometria_alvo(session)
         center_x_norm = center_x / diagonal
         center_y_norm = center_y / diagonal
         return math.hypot(click_pos[0] - center_x_norm, click_pos[1] - center_y_norm)

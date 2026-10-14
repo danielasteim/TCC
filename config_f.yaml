@@ -1,0 +1,45 @@
+# Configuração única dos experimentos do TCC.
+# Todos os scripts em scripts/ leem este arquivo via scripts/common_f.py.
+
+semente: 42
+
+caminhos:
+  humanos: captcha_data_v2        # sessões humanas do coletor v2 (somente leitura)
+  humanos_v1: captcha_data        # sessões do coletor v1, só para referência
+  bots_trajetorias: data/bot/traj
+  bots_sessoes: data/bot/sessions
+  resultados: results
+  tabelas: results/tables
+  figuras: results/figures
+  modelos: models
+
+# Pré-processamento e modelos (iguais aos do training.py)
+winsorizacao: [0.005, 0.995]
+k_folds: 5
+svm:
+  kernel: rbf
+  nu: 0.05
+  gamma: auto
+floresta:
+  n_estimators: 250
+  max_samples: 1.0
+  contamination: auto
+
+# Estimação dos parâmetros nos humanos (scripts/00_estimate_params_f.py)
+estimacao:
+  L_minimo_ajuste: 50        # px; trajetórias mais curtas não entram no ajuste das formas
+  n_direcoes: 8              # setores de direção para M (como em Acien et al., 2022)
+  n_faixas_L: 3              # faixas de comprimento (tercis) para M
+  n_minimo_celula: 30        # abaixo disso, a célula usa a estatística da direção inteira
+  grade_b: [-8.0, 8.0, 0.25] # busca do expoente b da forma exponencial
+  percentis_parametros: [5, 95]
+
+# Gerador de trajetórias (scripts/01_generate_bots_f.py)
+gerador:
+  trajetorias_por_familia: 150
+  M_minimo: 10
+  tentativas_por_trajetoria: 50   # reamostra se a trajetória sair da tela
+
+# Bot de replay (semana 2)
+replay:
+  dt_T0_ms: 8
