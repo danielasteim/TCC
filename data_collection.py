@@ -52,7 +52,7 @@ VERSAO_COLETOR = 3
 PASTA_SAIDA = 'captcha_data_f'
 
 # Intervalo entre o clique e o início da próxima sessão
-PAUSA_ENTRE_SESSOES_MS = 500
+PAUSA_ENTRE_SESSOES_MS = 100
 
 # Tamanho do painel que contém o checkbox
 LARGURA_PAINEL, ALTURA_PAINEL = 400, 250
@@ -114,6 +114,7 @@ class Captcha:
         return {
             'session_id': datetime.now().strftime('%Y%m%d_%H%M%S_%f'),
             'collector_version': VERSAO_COLETOR,
+            'pause_between_sessions_ms': PAUSA_ENTRE_SESSOES_MS,
             'session_user': session_user,
             'mouse_movements': [],
             'timestamps': [],
