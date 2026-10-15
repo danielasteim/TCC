@@ -42,9 +42,13 @@ gerador:
   M_minimo: 10
   tentativas_por_trajetoria: 50   # reamostra se a trajetória sair da tela
 
-# Bot de replay (semana 2)
+# Bot de replay (02_bot_replay_f.py)
 replay:
-  dt_T0_ms: 8
+  sessoes_por_celula: 150   # por família (forma x perfil) e por nível de tempo
+  niveis_tempo: [T0, T1]
+  dt_T0_ms: 8               # T0: intervalo fixo entre pontos
+  atraso_inicio_ms: 150     # espera após o painel aparecer, antes de mover
+  limite_sessao_s: 10       # se a sessão não salvar nesse tempo, refaz
 
 # Seleção das sessões humanas (selecionar_sessoes_f.py)
 # Computador principal: notebook Linux (onde o bot de replay também roda)

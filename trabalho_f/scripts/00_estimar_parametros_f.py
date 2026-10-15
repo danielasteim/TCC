@@ -151,6 +151,9 @@ def estimar(diretorio, config, limite=None, apenas=None):
         "dt": {
             "geral": {"media_ms": float(dts.mean() * 1000), "mediana_ms": float(np.median(dts) * 1000)},
             "quantis_s": np.percentile(dts, np.linspace(0, 100, 1001)).round(6).tolist(),
+            # sem os intervalos < 1 ms (eventos entregues em rajada, ver MIN_DT
+            # em features.py); é desta distribuição que o nível T1 do bot sorteia
+            "quantis_s_min_1ms": np.percentile(dts[dts >= 0.001], np.linspace(0, 100, 1001)).round(6).tolist(),
         },
         "quadratica": {
             "a": _resumo(a_quad, p_inf, p_sup),
