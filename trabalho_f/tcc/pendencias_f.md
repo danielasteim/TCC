@@ -37,6 +37,4 @@ Ajustes já identificados no texto do TCC. Marcar ao resolver no `.tex`.
 - [ ] $a$ e $b$ da exponencial são sorteados como par (da mesma trajetória humana), dentro dos percentis 5–95 de cada um.
 - [ ] Perfil "constante" espaça os pontos uniformemente ao longo do segmento $P_0 \to P_c$ (como Acien, que espaça $x$), e não ao longo do arco: em formas muito curvas, a distância entre pontos varia. Decidir se mantém (fiel ao artigo) ou se reparametriza por comprimento de arco.
 - [ ] $P_0$ dos humanos v3 é onde o cursor estava ao abrir a sessão (o ponto do clique anterior). Descrever ao apresentar a distribuição de $P_0$.
-- [ ] Expoente $b$ da exponencial: a busca foi limitada a $|b| \le 10$. Mais de 5 % das trajetórias humanas têm o melhor ajuste no limite (mesmo ampliando para ±20), o que corresponde a desvio concentrado num extremo do movimento (correção final). Declarar o limite e essa interpretação.
-- [ ] Base humana: notebook Linux (1366 × 768), mouse e touchpad sem rótulo por sessão; 5.060 sessões incluídas de 6.000 (critérios em `selecao_humanos.csv`: tela, pausa de 100 ms, duração ≤ 5 s, ≥ 10 eventos). O bot roda no mesmo notebook. Mistura de dispositivos de entrada vai para as limitações.
-- [ ] Notebook: 4–7 % dos intervalos entre eventos < 1 ms (eventos entregues em rajadas ao programa); tratado pelo piso `MIN_DT`. Afeta humanos e bots igualmente, pois rodam no mesmo computador.
+- [ ] Expoente $b$ da exponencial bate nos limites da grade de busca (±8) nos percentis 5 e 95; revisar a grade com os dados v3 antes de fixar a faixa no texto.

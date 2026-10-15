@@ -70,19 +70,16 @@ def _escala_dpi():
 
 
 class Captcha:
-    def __init__(self, root, usuario=None, pasta_saida=PASTA_SAIDA):
-        # usuario e pasta_saida permitem reaproveitar a interface no bot de
-        # replay (trabalho_f/scripts/02_bot_replay_f.py) sem o diálogo de nome
+    def __init__(self, root):
         self.root = root
         self.root.title("Behavioral CAPTCHA")
         self.root.configure(bg='#f0f0f0')
-        self.pasta_saida = pasta_saida
 
         # Dados da sessão
         self.session_data = self._nova_sessao(session_user=[])
 
         # Recorda sessão do usuário
-        name = usuario if usuario is not None else simpledialog.askstring(
+        name = simpledialog.askstring(
             title="Identificação",
             prompt="Digite seu nome e último sobrenome:",
             parent=self.root
@@ -407,17 +404,16 @@ class Captcha:
             self.is_tracking = True
             return
 
-        os.makedirs(self.pasta_saida, exist_ok=True)
+        os.makedirs(PASTA_SAIDA, exist_ok=True)
 
         self.session_data['metrics'] = self.calculate_metrics()
 
         name = self.session_data['session_user'][0].replace(' ', '_')
         filename = (
-            f"{self.pasta_saida}/session_{self.session_data['session_id']}_{name}.json"
+            f"{PASTA_SAIDA}/session_{self.session_data['session_id']}_{name}.json"
         )
         with open(filename, 'w') as f:
             json.dump(self.session_data, f, indent=2)
-        self.ao_salvar_sessao(filename)
 
         print(f"\nData saved to: {filename}")
 
@@ -428,10 +424,6 @@ class Captcha:
         self.checkbox.config(state='disabled')
         self.sessions_count += 1
         self.root.after(PAUSA_ENTRE_SESSOES_MS, self.reset_session)
-
-    def ao_salvar_sessao(self, arquivo):
-        """Chamado depois que a sessão é salva; o bot de replay sobrescreve."""
-        pass
 
     def _separar_eventos_apos_clique(self):
         """

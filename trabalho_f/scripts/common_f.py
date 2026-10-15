@@ -35,16 +35,12 @@ def caminho(config: dict, chave: str) -> Path:
     return RAIZ / config["caminhos"][chave]
 
 
-def carregar_sessoes(diretorio: Path, limite: int = None, semente: int = 0, apenas: list = None):
+def carregar_sessoes(diretorio: Path, limite: int = None, semente: int = 0):
     """
-    Lê os JSONs de sessão de `diretorio`. Com `apenas`, lê só os arquivos
-    dessa lista (ex.: as sessões incluídas em selecao_humanos.csv). Com
-    `limite`, lê uma amostra aleatória (reprodutível) desse tamanho.
+    Lê os JSONs de sessão de `diretorio`. Com `limite`, lê uma amostra
+    aleatória (reprodutível) desse tamanho — útil para testes rápidos.
     """
     arquivos = sorted(Path(diretorio).glob("*.json"))
-    if apenas is not None:
-        apenas = set(apenas)
-        arquivos = [a for a in arquivos if a.name in apenas]
     if limite is not None and limite < len(arquivos):
         rng = np.random.default_rng(semente)
         arquivos = [arquivos[i] for i in sorted(rng.choice(len(arquivos), limite, replace=False))]

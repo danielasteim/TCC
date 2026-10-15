@@ -13,7 +13,6 @@ caminhos:
   tabelas: trabalho_f/resultados/tabelas
   figuras: trabalho_f/resultados/figuras
   modelos: trabalho_f/modelos
-  selecao_humanos: trabalho_f/resultados/selecao_humanos.csv
 
 # Pré-processamento e modelos (iguais aos do training.py)
 winsorizacao: [0.005, 0.995]
@@ -33,7 +32,7 @@ estimacao:
   n_direcoes: 8              # setores de direção para M (como em Acien et al., 2022)
   n_faixas_L: 3              # faixas de comprimento (tercis) para M
   n_minimo_celula: 30        # abaixo disso, a célula usa a estatística da direção inteira
-  grade_b: [-10.0, 10.0, 0.25] # |b| limitado: valores no limite = desvio concentrado num extremo
+  grade_b: [-8.0, 8.0, 0.25] # busca do expoente b da forma exponencial
   percentis_parametros: [5, 95]
 
 # Gerador de trajetórias (01_gerar_trajetorias_f.py)
@@ -42,20 +41,6 @@ gerador:
   M_minimo: 10
   tentativas_por_trajetoria: 50   # reamostra se a trajetória sair da tela
 
-# Bot de replay (02_bot_replay_f.py)
+# Bot de replay (semana 2)
 replay:
-  sessoes_por_celula: 150   # por família (forma x perfil) e por nível de tempo
-  niveis_tempo: [T0, T1]
-  dt_T0_ms: 8               # T0: intervalo fixo entre pontos
-  atraso_inicio_ms: 150     # espera após o painel aparecer, antes de mover
-  limite_sessao_s: 10       # se a sessão não salvar nesse tempo, refaz
-
-# Seleção das sessões humanas (selecionar_sessoes_f.py)
-# Computador principal: notebook Linux (onde o bot de replay também roda)
-selecao:
-  largura: 1366
-  altura: 768
-  dpi: null              # o coletor só lê a escala de DPI no Windows
-  pausa_ms: 100
-  duracao_max_s: 5.0
-  eventos_min: 10
+  dt_T0_ms: 8
