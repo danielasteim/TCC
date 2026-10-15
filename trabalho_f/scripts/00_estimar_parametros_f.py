@@ -7,6 +7,7 @@ trajetórias (seção 3.5.2) e salva em trabalho_f/resultados/params_humanos.jso
   - P0: posição do primeiro evento, relativa ao tamanho da janela
   - alvo: centro do checkbox, relativo ao tamanho da janela
   - deslocamento do clique em relação ao centro do alvo (px)
+  (por padrão, só as sessões incluídas em selecao_humanos.csv)
   - M (número de eventos): média e desvio por direção (8 setores, como em
     Acien et al., 2022) x faixa de comprimento L (tercis)
   - Δt entre eventos: função quantil empírica (usada no nível T1 do replay)
@@ -31,6 +32,7 @@ import numpy as np
 from common_f import (RAIZ, caminho, carregar_config, carregar_sessoes, centro_alvo,
                       para_sistema_local, pontos_e_tempos, setor_direcao, tamanho_janela)
 from gerador_f import ajustar_exponencial, ajustar_quadratica
+from selecionar_sessoes_f import arquivos_incluidos
 
 
 def _resumo(valores, p_inf, p_sup, n_quantis=101):
@@ -47,7 +49,7 @@ def _resumo(valores, p_inf, p_sup, n_quantis=101):
     }
 
 
-def estimar(diretorio, config, limite=None):
+def estimar(diretorio, config, limite=None, apenas=None):
     est = config["estimacao"]
     p_inf, p_sup = est["percentis_parametros"]
     grade_b = np.arange(est["grade_b"][0], est["grade_b"][1] + 1e-9, est["grade_b"][2])
@@ -59,7 +61,7 @@ def estimar(diretorio, config, limite=None):
     larguras, alturas, versoes = [], [], set()
     n_sessoes = n_descartadas = 0
 
-    for _, sessao in carregar_sessoes(diretorio, limite=limite, semente=config["semente"]):
+    for _, sessao in carregar_sessoes(diretorio, limite=limite, semente=config["semente"], apenas=apenas):
         pontos, tempos = pontos_e_tempos(sessao)
         clique = sessao.get("click_data", {}).get("click_position")
         if len(pontos) < 2 or clique is None or len(tempos) != len(pontos):
@@ -169,10 +171,17 @@ def principal():
     parser.add_argument("--dir", default=str(caminho(config, "humanos")), help="Diretório das sessões humanas")
     parser.add_argument("--saida", default=str(caminho(config, "resultados") / "params_humanos.json"))
     parser.add_argument("--limite", type=int, default=None, help="Usar só uma amostra de N sessões (teste)")
+    parser.add_argument("--todas", action="store_true",
+                        help="Ignorar selecao_humanos.csv e usar todas as sessões da pasta")
     args = parser.parse_args()
 
+    apenas = None
+    if not args.todas and caminho(config, "selecao_humanos").exists():
+        apenas = arquivos_incluidos(config)
+        print(f"Usando {len(apenas)} sessões de {caminho(config, 'selecao_humanos').name}")
+
     t0 = time.time()
-    params = estimar(args.dir, config, args.limite)
+    params = estimar(args.dir, config, args.limite, apenas)
 
     saida = Path(args.saida)
     if not saida.is_absolute():
