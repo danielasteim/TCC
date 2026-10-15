@@ -1,0 +1,103 @@
+{
+  "session_id": "20261015_074747_405857",
+  "collector_version": 3,
+  "pause_between_sessions_ms": 100,
+  "session_user": [
+    "DANIELA STEIM"
+  ],
+  "mouse_movements": [
+    {
+      "x": 443,
+      "y": 424,
+      "time_offset": 1.5627970695495605
+    },
+    {
+      "x": 445,
+      "y": 426,
+      "time_offset": 1.5630199909210205
+    },
+    {
+      "x": 455,
+      "y": 439,
+      "time_offset": 1.5631935596466064
+    },
+    {
+      "x": 455,
+      "y": 439,
+      "time_offset": 1.6718823909759521
+    },
+    {
+      "x": 455,
+      "y": 439,
+      "time_offset": 1.8209106922149658
+    },
+    {
+      "x": 454,
+      "y": 440,
+      "time_offset": 1.8273766040802002
+    }
+  ],
+  "timestamps": [
+    1792061268.9686399,
+    1792061268.9688628,
+    1792061268.9690363,
+    1792061269.0777252,
+    1792061269.2267535,
+    1792061269.2332194
+  ],
+  "velocities": [
+    12688.00342570208,
+    94494.09397625692,
+    0.0,
+    0.0,
+    218.71834813848534
+  ],
+  "accelerations": [
+    471318149.4787834,
+    471318149.4787834,
+    471318149.4787834,
+    471318149.4787834
+  ],
+  "click_data": {
+    "time_to_click": 2.031033992767334,
+    "click_position": [
+      454,
+      440
+    ],
+    "click_timestamp": 1792061269.4368768
+  },
+  "total_time": 2.031033992767334,
+  "distance_traveled": 20.64386015397601,
+  "window_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "screen_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "window_origin": {
+    "x": 0,
+    "y": 0
+  },
+  "dpi_scale": null,
+  "target": {
+    "x": 441,
+    "y": 427,
+    "width": 25,
+    "height": 21,
+    "center_x": 453.5,
+    "center_y": 437.5
+  },
+  "movements_after_click": [],
+  "metrics": {
+    "total_time": 2.031033992767334,
+    "num_movements": 6,
+    "total_distance": 20.64386015397601,
+    "avg_velocity": 21480.163150019496,
+    "max_velocity": 94494.09397625692,
+    "avg_acceleration": 471318149.4787834,
+    "max_acceleration": 471318149.4787834,
+    "time_to_click": 2.031033992767334
+  }
+}

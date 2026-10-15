@@ -1,0 +1,103 @@
+{
+  "session_id": "20261015_075402_833902",
+  "collector_version": 3,
+  "pause_between_sessions_ms": 100,
+  "session_user": [
+    "DANIELA STEIM"
+  ],
+  "mouse_movements": [
+    {
+      "x": 359,
+      "y": 310,
+      "time_offset": 1.6026031970977783
+    },
+    {
+      "x": 371,
+      "y": 319,
+      "time_offset": 1.6027867794036865
+    },
+    {
+      "x": 412,
+      "y": 356,
+      "time_offset": 1.6078295707702637
+    },
+    {
+      "x": 416,
+      "y": 351,
+      "time_offset": 1.608015775680542
+    },
+    {
+      "x": 432,
+      "y": 329,
+      "time_offset": 1.608142614364624
+    },
+    {
+      "x": 434,
+      "y": 327,
+      "time_offset": 1.6091182231903076
+    }
+  ],
+  "timestamps": [
+    1792061644.436491,
+    1792061644.4366746,
+    1792061644.4417174,
+    1792061644.4419036,
+    1792061644.4420304,
+    1792061644.443006
+  ],
+  "velocities": [
+    81707.22077922078,
+    10951.63394067245,
+    34387.515494957166,
+    214468.80511530492,
+    2899.140567700744
+  ],
+  "accelerations": [
+    -14031035.927344836,
+    -14031035.927344836,
+    -14031035.927344836,
+    -14031035.927344836
+  ],
+  "click_data": {
+    "time_to_click": 1.8407630920410156,
+    "click_position": [
+      434,
+      327
+    ],
+    "click_timestamp": 1792061644.674651
+  },
+  "total_time": 1.8407630920410156,
+  "distance_traveled": 106.66129746558623,
+  "window_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "screen_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "window_origin": {
+    "x": 0,
+    "y": 0
+  },
+  "dpi_scale": null,
+  "target": {
+    "x": 420,
+    "y": 313,
+    "width": 25,
+    "height": 21,
+    "center_x": 432.5,
+    "center_y": 323.5
+  },
+  "movements_after_click": [],
+  "metrics": {
+    "total_time": 1.8407630920410156,
+    "num_movements": 6,
+    "total_distance": 106.66129746558623,
+    "avg_velocity": 68882.8631795712,
+    "max_velocity": 214468.80511530492,
+    "avg_acceleration": -14031035.927344836,
+    "max_acceleration": -14031035.927344836,
+    "time_to_click": 1.8407630920410156
+  }
+}
