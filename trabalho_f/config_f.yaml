@@ -26,6 +26,16 @@ floresta:
   max_samples: 1.0
   contamination: auto
 
+# Extração das 12 características (caracteristicas_f.py, Caracteristicas.de_config)
+caracteristicas:
+  min_dt: 0.001              # s; amostras mais próximas que isso são fundidas
+  dt_reamostragem: 0.010     # s; reamostragem temporal para velocidade e jerk
+  janela_suavizacao: 5       # pontos da média móvel sobre as posições reamostradas
+  passo_curvatura_px: 5.0    # px; reamostragem por comprimento de arco na curvatura
+  limiar_pico: 0.10          # fração do pico global para contar um pico de velocidade
+  limiar_vale: 0.50          # vale < 50% do menor pico separa dois submovimentos
+  k_final: 5                 # eventos finais da desaceleracao_final
+
 # Estimação dos parâmetros nos humanos (00_estimar_parametros_f.py)
 estimacao:
   L_minimo_ajuste: 50        # px; trajetórias mais curtas não entram no ajuste das formas

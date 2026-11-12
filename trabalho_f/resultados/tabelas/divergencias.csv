@@ -1,0 +1,2 @@
+conjunto,rejeitado_por_ambos,aceito_por_ambos,rejeitado_so_pelo_svm,rejeitado_so_pela_floresta,p_valor_mcnemar
+humanos,435,9266,139,164,0.16786241187896456

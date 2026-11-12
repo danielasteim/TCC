@@ -1,0 +1,103 @@
+{
+  "session_id": "20261109_225853_897904",
+  "collector_version": 3,
+  "pause_between_sessions_ms": 100,
+  "session_user": [
+    "DANIELA STEIM"
+  ],
+  "mouse_movements": [
+    {
+      "x": 992,
+      "y": 270,
+      "time_offset": 1.0279181003570557
+    },
+    {
+      "x": 992,
+      "y": 270,
+      "time_offset": 1.0820724964141846
+    },
+    {
+      "x": 992,
+      "y": 270,
+      "time_offset": 1.088538408279419
+    },
+    {
+      "x": 992,
+      "y": 271,
+      "time_offset": 1.1361083984375
+    },
+    {
+      "x": 993,
+      "y": 271,
+      "time_offset": 1.1425096988677979
+    },
+    {
+      "x": 993,
+      "y": 270,
+      "time_offset": 1.1495559215545654
+    }
+  ],
+  "timestamps": [
+    1794275934.9258013,
+    1794275934.9799557,
+    1794275934.9864216,
+    1794275935.0339916,
+    1794275935.0403929,
+    1794275935.047439
+  ],
+  "velocities": [
+    0.0,
+    0.0,
+    21.021656651112906,
+    156.2182576632277,
+    141.92001082763755
+  ],
+  "accelerations": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "click_data": {
+    "time_to_click": 1.3866498470306396,
+    "click_position": [
+      993,
+      270
+    ],
+    "click_timestamp": 1794275935.284533
+  },
+  "total_time": 1.3866498470306396,
+  "distance_traveled": 3.0,
+  "window_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "screen_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "window_origin": {
+    "x": 0,
+    "y": 0
+  },
+  "dpi_scale": null,
+  "target": {
+    "x": 984,
+    "y": 256,
+    "width": 25,
+    "height": 21,
+    "center_x": 996.5,
+    "center_y": 266.5
+  },
+  "movements_after_click": [],
+  "metrics": {
+    "total_time": 1.3866498470306396,
+    "num_movements": 6,
+    "total_distance": 3.0,
+    "avg_velocity": 63.83198502839563,
+    "max_velocity": 156.2182576632277,
+    "avg_acceleration": 0.0,
+    "max_acceleration": 0.0,
+    "time_to_click": 1.3866498470306396
+  }
+}
