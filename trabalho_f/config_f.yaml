@@ -17,13 +17,14 @@ caminhos:
 # Pré-processamento e modelos (iguais aos do training.py)
 winsorizacao: [0.005, 0.995]
 k_folds: 5
+fpr_alvo: 0.05              # limiar de decisão calibrado para rejeitar 5% dos humanos de treino
 svm:
   kernel: rbf
   nu: 0.05
   gamma: auto
 floresta:
   n_estimators: 250
-  max_samples: 1.0
+  max_samples: 256          # subamostra por árvore (padrão de Liu, Ting e Zhou, 2008)
   contamination: auto
 
 # Extração das 12 características (caracteristicas_f.py, Caracteristicas.de_config)
@@ -35,6 +36,7 @@ caracteristicas:
   limiar_pico: 0.10          # fração do pico global para contar um pico de velocidade
   limiar_vale: 0.50          # vale < 50% do menor pico separa dois submovimentos
   k_final: 5                 # eventos finais da desaceleracao_final
+  faixas_entropia: 20        # faixas do histograma da entropia_velocidade (0 a v_pico)
 
 # Estimação dos parâmetros nos humanos (00_estimar_parametros_f.py)
 estimacao:
@@ -51,6 +53,10 @@ gerador:
   M_minimo: 10
   tentativas_por_trajetoria: 50   # reamostra se a trajetória sair da tela
 
-# Bot de replay (semana 2)
+# Bot de replay (03_bot_replay_f.py)
 replay:
-  dt_T0_ms: 8
+  sessoes_por_celula: 150   # por família (forma x perfil) e por nível de tempo
+  niveis_tempo: [T0, T1]
+  dt_T0_ms: 7               # T0: intervalo fixo entre pontos (≈ mediana humana de Δt, 6,8 ms)
+  atraso_inicio_ms: 150     # espera após o painel aparecer, antes de mover
+  limite_sessao_s: 10       # se a sessão não salvar nesse tempo, refaz

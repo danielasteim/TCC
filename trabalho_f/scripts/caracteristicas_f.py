@@ -17,10 +17,11 @@ Grupos e características (fundamentação no Capítulo 2):
     jerk_adimensional    log dimensionless jerk (LDLJ)
     n_submovimentos      número de picos da velocidade suavizada
     razao_pico_media     velocidade de pico / velocidade média
+    entropia_velocidade  entropia de Shannon (bits) do histograma da
+                         velocidade reamostrada, em B faixas de 0 a v_pico
   Temporais
     residuo_fitts        MT - (a + b·ID); a e b ajustados no treino
     instante_pico        instante do pico de velocidade / duração
-    razao_metades        velocidade média da 2ª metade / da 1ª metade
   Aproximação e clique
     desaceleracao_final  velocidade média dos k últimos eventos / média geral
     dist_clique          distância clique -> centro do alvo, / diagonal da janela
@@ -59,8 +60,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 GRUPOS = {
     "geometricas": ["razao_trajetoria", "desvio_maximo", "curvatura_media"],
-    "cinematicas": ["jerk_adimensional", "n_submovimentos", "razao_pico_media"],
-    "temporais": ["residuo_fitts", "instante_pico", "razao_metades"],
+    "cinematicas": ["jerk_adimensional", "n_submovimentos", "razao_pico_media", "entropia_velocidade"],
+    "temporais": ["residuo_fitts", "instante_pico"],
     "aproximacao_clique": ["desaceleracao_final", "dist_clique", "tempo_parado"],
 }
 CARACTERISTICAS = [c for grupo in GRUPOS.values() for c in grupo]  # as 12 finais
@@ -81,7 +82,8 @@ class Caracteristicas:
                  passo_curvatura_px: float = 5.0,
                  limiar_pico: float = 0.10,
                  limiar_vale: float = 0.50,
-                 k_final: int = 5):
+                 k_final: int = 5,
+                 faixas_entropia: int = 20):
         """
         min_dt              amostras a menos de min_dt (s) da anterior são fundidas
                             (eventos acumulados na fila da interface)
@@ -94,6 +96,7 @@ class Caracteristicas:
         limiar_vale         dois picos são submovimentos distintos se o vale entre
                             eles for < limiar_vale × o menor dos dois
         k_final             eventos finais usados na desaceleracao_final
+        faixas_entropia     número de faixas do histograma da entropia_velocidade
         """
         self.min_dt = min_dt
         self.dt = dt_reamostragem
@@ -102,6 +105,7 @@ class Caracteristicas:
         self.limiar_pico = limiar_pico
         self.limiar_vale = limiar_vale
         self.k_final = k_final
+        self.faixas_entropia = faixas_entropia
 
     @classmethod
     def de_config(cls, config: dict) -> "Caracteristicas":
@@ -243,12 +247,19 @@ class Caracteristicas:
     def instante_pico(k: dict, dt: float) -> float:
         return float(np.argmax(k["v"]) * dt / k["T"]) if k["T"] > 0 else np.nan
 
-    @staticmethod
-    def razao_metades(k: dict) -> float:
+    def entropia_velocidade(self, k: dict) -> float:
+        """
+        H = -sum p_b·log2(p_b) sobre o histograma da velocidade reamostrada
+        (passo fixo no tempo, então p_b é a fração do tempo em cada faixa),
+        com B faixas iguais entre 0 e v_pico; faixas vazias não entram na soma.
+        """
         v = k["v"]
-        meio = len(v) // 2
-        primeira = v[:meio].mean()
-        return float(v[meio:].mean() / primeira) if primeira > 0 else np.nan
+        v_pico = v.max()
+        if v_pico <= 0:
+            return np.nan
+        contagens, _ = np.histogram(v, bins=self.faixas_entropia, range=(0.0, v_pico))
+        p = contagens[contagens > 0] / contagens.sum()
+        return float(-(p * np.log2(p)).sum())
 
     # ------------------------------------------------------------------
     # Aproximação e clique
@@ -285,7 +296,7 @@ class Caracteristicas:
             "n_submovimentos": self.n_submovimentos(k) if k else nan,
             "razao_pico_media": self.razao_pico_media(k, d) if k else nan,
             "instante_pico": self.instante_pico(k, self.dt) if k else nan,
-            "razao_metades": self.razao_metades(k) if k else nan,
+            "entropia_velocidade": self.entropia_velocidade(k) if k else nan,
             "desaceleracao_final": self.desaceleracao_final(d),
             "dist_clique": self.dist_clique(d),
             "tempo_parado": self.tempo_parado(d),

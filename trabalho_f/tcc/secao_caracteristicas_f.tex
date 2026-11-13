@@ -1,0 +1,147 @@
+% ============================================================
+% 3.2.2 Extração de características
+% Descreve exatamente o que trabalho_f/scripts/caracteristicas_f.py faz.
+% As chaves de citação (\citeonline{...}) precisam ser trocadas pelas do
+% seu .bib. Referências que ainda não estão no trabalho:
+% Balasubramanian et al. (2015) e MacKenzie (1992).
+% ============================================================
+
+\subsection{Extração de características}
+\label{sec:caracteristicas}
+
+Cada sessão de coleta é convertida em um vetor de 12 características numéricas, que descrevem a geometria da trajetória, o seu perfil de velocidade, a sua duração e o comportamento do cursor na aproximação e no clique. As características foram escolhidas a partir das medidas apresentadas na \autoref{sec:extracao} e do método de geração de trajetórias sintéticas utilizado nos testes (\autoref{sec:bots}), de forma que cada aspecto que distingue as famílias de \textit{bots} --- a forma do percurso e o perfil de velocidade --- seja representado por ao menos uma característica.
+
+\subsubsection{Pré-processamento das sessões}
+
+Antes do cálculo, cada sessão passa por três etapas:
+
+\begin{enumerate}
+    \item \textbf{Corte no clique:} são mantidos apenas os eventos com $t_i \leq t_c$. Os movimentos registrados entre o pressionamento e a liberação do botão não fazem parte da trajetória.
+    \item \textbf{Fusão de eventos acumulados:} quando dois eventos consecutivos têm intervalo inferior a 1~ms, apenas o primeiro é mantido. Esses eventos correspondem a movimentos acumulados na fila da interface e entregues de uma só vez, e não a deslocamentos reais tão rápidos.
+    \item \textbf{Validação:} sessões com menos de três eventos após as etapas anteriores, ou com alguma característica indefinida, são descartadas.
+\end{enumerate}
+
+Como os eventos de movimento chegam em intervalos irregulares, as características que dependem da velocidade e de suas derivadas são calculadas sobre uma versão reamostrada da trajetória: as coordenadas são interpoladas linearmente em instantes espaçados de $\Delta = 10$~ms e suavizadas por uma média móvel de cinco pontos. A velocidade $\mathbf{v}(t)$ e o \textit{jerk} $\mathbf{j}(t)$ são obtidos por diferenças centrais sucessivas, e $T$ denota a duração do movimento reamostrado, do primeiro ao último evento.
+
+Ao longo da seção, $P_1 = (x_1, y_1)$ é a posição do primeiro evento, $P_N$ a do último evento antes do clique, $P_c = (x_c, y_c)$ a posição do clique e $C$ o centro do \textit{checkbox}. A distância em linha reta entre o início e o clique é
+\begin{equation}
+    L = \lVert P_c - P_1 \rVert .
+\end{equation}
+
+\subsubsection{Características geométricas}
+
+\paragraph{Razão da trajetória.} Relação entre o comprimento efetivamente percorrido e a distância em linha reta, considerando a polilinha formada pelos eventos e pelo ponto do clique ($Q_1, \dots, Q_{N+1}$, com $Q_{N+1} = P_c$):
+\begin{equation}
+    r_{\text{traj}} = \frac{1}{L} \sum_{k=1}^{N} \lVert Q_{k+1} - Q_k \rVert .
+\end{equation}
+Vale 1 para uma linha reta e cresce conforme o percurso se afasta dela. É o inverso da eficiência geométrica descrita por \citeonline{alshorman2022}.
+
+\paragraph{Desvio máximo.} Maior distância perpendicular entre um ponto da trajetória e a reta $P_1 P_c$, normalizada por $L$:
+\begin{equation}
+    d_{\max} = \frac{1}{L} \max_i \left| (P_i - P_1) \times \hat{u} \right| ,
+    \qquad \hat{u} = \frac{P_c - P_1}{L} .
+\end{equation}
+A normalização torna a medida independente do comprimento do movimento.
+
+\paragraph{Curvatura média.} Para que a medida não dependa da taxa de amostragem nem da grade de pixels, a trajetória é reamostrada a cada 5~px de comprimento de arco. Sendo $\theta_k$ a direção do segmento $k$ dessa trajetória reamostrada, a curvatura média é a média das mudanças absolutas de direção:
+\begin{equation}
+    \bar{\kappa} = \frac{1}{K-1} \sum_{k=1}^{K-1} \left| \operatorname{ang}(\theta_{k+1} - \theta_k) \right| ,
+\end{equation}
+em que $\operatorname{ang}(\cdot)$ leva o ângulo ao intervalo $(-\pi, \pi]$. O valor, em radianos por passo de 5~px, é nulo para um movimento retilíneo.
+
+\subsubsection{Características cinemáticas}
+
+\paragraph{\textit{Jerk} adimensional.} Mede a suavidade do movimento. Utiliza-se o logaritmo do \textit{jerk} adimensional (\textit{log dimensionless jerk}), que normaliza a integral do \textit{jerk} quadrático pela duração e pela velocidade de pico \cite{hogan2009, balasubramanian2015}:
+\begin{equation}
+    J = -\ln\left( \frac{T^3}{v_{\text{pico}}^2} \int_0^T \lVert \mathbf{j}(t) \rVert^2 \, dt \right) .
+\end{equation}
+Valores mais altos (menos negativos) indicam movimentos mais suaves.
+
+\paragraph{Número de submovimentos.} Contagem dos picos do perfil de velocidade reamostrado, como forma de identificar o movimento principal seguido de correções \cite{meyer1988}. Um pico só é considerado se a sua velocidade for de pelo menos 10\,\% da velocidade de pico da sessão, e dois picos consecutivos são contados como submovimentos distintos apenas quando a velocidade entre eles cai abaixo de 50\,\% do menor dos dois.
+
+\paragraph{Razão entre velocidade de pico e média.} Indica o quanto o pico de velocidade se destaca do restante do movimento \cite{flash1985}:
+\begin{equation}
+    r_{\text{pico}} = \frac{v_{\text{pico}}}{\bar{v}}, \qquad
+    \bar{v} = \frac{1}{T} \sum_{i=1}^{N-1} \lVert P_{i+1} - P_i \rVert .
+\end{equation}
+Um movimento de velocidade constante tem $r_{\text{pico}} \approx 1$.
+
+\paragraph{Entropia da velocidade.} Mede a variabilidade da velocidade ao longo do movimento \cite{shannon1948}. As velocidades da trajetória reamostrada são distribuídas em $B = 20$ faixas de mesma largura entre 0 e $v_{\text{pico}}$, e $p_b$ é a fração das amostras na faixa $b$. Como a reamostragem tem passo fixo no tempo, $p_b$ corresponde à fração do tempo em que o cursor se moveu naquela faixa de velocidade:
+\begin{equation}
+    H_v = -\sum_{b=1}^{B} p_b \log_2 p_b ,
+\end{equation}
+com a convenção $0 \log_2 0 = 0$. O valor, em \textit{bits}, varia de 0, quando a velocidade permanece em uma única faixa, como em um movimento de velocidade constante, a $\log_2 20 \approx 4{,}32$, quando o tempo se distribui igualmente entre todas as faixas. Como as faixas são definidas em relação à velocidade de pico de cada sessão, a medida não depende da escala do movimento.
+
+\subsubsection{Características temporais}
+
+\paragraph{Resíduo de Fitts.} O tempo de movimento é $MT = t_c - t_1$ e o índice de dificuldade segue a formulação de Shannon da Lei de Fitts \cite{fitts1954, mackenzie1992}:
+\begin{equation}
+    ID = \log_2\left( \frac{L}{W} + 1 \right) ,
+\end{equation}
+em que $W$ é a menor dimensão do \textit{checkbox}. Os coeficientes $a$ e $b$ do modelo $MT = a + b \cdot ID$ são estimados por mínimos quadrados apenas com as sessões de treino de cada partição (\autoref{sec:treinamento}), e a característica é o resíduo
+\begin{equation}
+    e_{\text{Fitts}} = MT - (a + b \cdot ID) .
+\end{equation}
+Resíduos positivos indicam movimentos mais lentos que o previsto para a dificuldade do alvo, e negativos, mais rápidos.
+
+\paragraph{Instante do pico de velocidade.} Posição relativa, na duração do movimento, em que a velocidade atinge o máximo:
+\begin{equation}
+    \tau_{\text{pico}} = \frac{t_{\text{pico}} - t_1}{T} .
+\end{equation}
+No perfil em sino descrito por \citeonline{flash1985}, o pico ocorre próximo à metade do movimento. Essa medida complementa a razão entre velocidade de pico e média, que descreve a altura do pico, mas não a sua posição.
+
+\subsubsection{Aproximação e clique}
+
+\paragraph{Desaceleração final.} Razão entre a velocidade média nos últimos cinco eventos e a velocidade média de toda a trajetória, com as velocidades calculadas diretamente entre eventos consecutivos ($v_i = \lVert P_{i+1} - P_i \rVert / (t_{i+1} - t_i)$):
+\begin{equation}
+    r_{\text{final}} = \frac{\frac{1}{5} \sum_{i=N-5}^{N-1} v_i}{\frac{1}{N-1} \sum_{i=1}^{N-1} v_i} .
+\end{equation}
+
+\paragraph{Distância do clique ao centro do alvo.} Distância entre o clique e o centro do \textit{checkbox} da sessão, normalizada pela diagonal da janela ($D_{\text{jan}}$):
+\begin{equation}
+    d_{\text{clique}} = \frac{\lVert P_c - C \rVert}{D_{\text{jan}}} .
+\end{equation}
+Como o painel muda de posição a cada sessão, $C$ é lido da geometria registrada em cada arquivo. A medida reflete a precisão do posicionamento, que em automações simples tende a coincidir com o centro do alvo.
+
+\paragraph{Tempo parado antes do clique.} Intervalo entre o último evento de movimento e o clique:
+\begin{equation}
+    t_{\text{parado}} = t_c - t_N .
+\end{equation}
+Representa a pausa de confirmação que antecede o clique humano, ausente quando o clique é disparado logo após o último deslocamento.
+
+\subsubsection{Resumo}
+
+A \autoref{tab:caracteristicas} reúne as 12 características, agrupadas, com os valores observados nas sessões humanas.
+
+\begin{table}[htbp]
+\centering
+\caption{Características extraídas e valores nas 10.004 sessões humanas}
+\label{tab:caracteristicas}
+\begin{tabular}{llrrr}
+\hline
+Grupo & Característica & P5 & Mediana & P95 \\
+\hline
+\multirow{3}{*}{Geométricas}
+ & Razão da trajetória         & 1,03   & 1,13   & 1,62 \\
+ & Desvio máximo               & 0,039  & 0,142  & 0,378 \\
+ & Curvatura média (rad)       & 0,043  & 0,091  & 0,200 \\
+\hline
+\multirow{4}{*}{Cinemáticas}
+ & \textit{Jerk} adimensional  & $-11,8$ & $-9,6$ & $-8,0$ \\
+ & Número de submovimentos     & 1      & 2      & 3 \\
+ & Razão pico/média            & 2,19   & 3,79   & 7,98 \\
+ & Entropia da velocidade (\textit{bits}) & 1,98   & 3,22   & 3,90 \\
+\hline
+\multirow{2}{*}{Temporais}
+ & Resíduo de Fitts (s)        & \multicolumn{3}{c}{ajustado em cada partição} \\
+ & Instante do pico            & 0,025  & 0,065  & 0,318 \\
+\hline
+\multirow{3}{*}{Aproximação e clique}
+ & Desaceleração final         & 0,028  & 0,108  & 0,328 \\
+ & Distância do clique         & 0,0010 & 0,0030 & 0,0063 \\
+ & Tempo parado (s)            & 0,177  & 0,217  & 0,294 \\
+\hline
+\end{tabular}
+\fonte{Autoria própria.}
+\end{table}
+% \multirow precisa de \usepackage{multirow}

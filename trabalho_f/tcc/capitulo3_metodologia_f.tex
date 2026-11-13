@@ -1,0 +1,436 @@
+% =====================================================================
+% Capítulo 3 — Metodologia (versão reescrita)
+%
+% Notas para colar no template da UTFPR (abnTeX2):
+%  - \pendente{...} marca valores que dependem do fim da coleta ou da
+%    execução do bot. Defina no preâmbulo, se ainda não existir:
+%      \providecommand{\pendente}[1]{\textbf{[#1]}}
+%  - Chaves de citação usadas aqui (ajuste para as do seu .bib):
+%      acien2022    -> NOVA entrada (ver abaixo); substitui Acien 2020 e
+%                      Niu 2021, que são o mesmo trabalho (arXiv 2005.00890)
+%      marques2023, demsar2006, scholkopf2001b, liu2008, liuting2008,
+%      magossi2021
+%  - Rótulos de figura usados: fig:fluxo_coleta, fig:fluxo_avaliacao,
+%    fig:interface, fig:gerador_exemplos (as Figuras 9 e 10 precisam
+%    ganhar o ramo de geração e replay dos bots). O capítulo 4 precisa do
+%    rótulo cap:resultados.
+%  - A figura da interface (Figura 11) precisa ser refeita: tela cheia,
+%    texto "Autenticação" fora do checkbox.
+%
+% Entrada BibTeX sugerida para o artigo do BeCAPTCHA-Mouse:
+%   @article{acien2022,
+%     author  = {Acien, Alejandro and Morales, Aythami and Fierrez, Julian
+%                and Vera-Rodriguez, Ruben},
+%     title   = {{BeCAPTCHA-Mouse}: Synthetic mouse trajectories and improved
+%                bot detection},
+%     journal = {Pattern Recognition},
+%     volume  = {127},
+%     pages   = {108643},
+%     year    = {2022},
+%     doi     = {10.1016/j.patcog.2022.108643}
+%   }
+% =====================================================================
+
+\chapter{Metodologia}
+
+Este capítulo descreve o processo metodológico empregado para o desenvolvimento e a análise do sistema de CAPTCHA comportamental. São apresentados o ambiente de desenvolvimento, a visão geral da abordagem, a interface e o protocolo de coleta das sessões humanas, a preparação das características, o método de geração das interações automatizadas, a configuração dos modelos de detecção de anomalias e o protocolo de avaliação. Por fim, discutem-se as limitações da abordagem proposta.
+
+% ---------------------------------------------------------------------
+\section{Ambiente, ferramentas e frameworks}
+
+A implementação deste trabalho foi realizada na linguagem Python. A interface gráfica foi desenvolvida com a biblioteca \textit{Tkinter}. Para o processamento dos dados foram utilizadas as bibliotecas NumPy e Pandas, e os modelos foram treinados com a biblioteca \textit{scikit-learn}. Foi criada uma classe em Python para a extração das características, reutilizada tanto no treinamento dos modelos quanto na aplicação. As interações automatizadas foram executadas com a biblioteca \textit{pyautogui}, que controla o cursor do sistema operacional.
+
+Todos os experimentos foram realizados em ambiente local e organizados em \textit{scripts} independentes e numerados para captura, pré-processamento, geração das interações automatizadas, treinamento e avaliação, de modo que cada tabela e figura do \autoref{cap:resultados} possa ser reproduzida a partir dos dados brutos. As versões das bibliotecas foram fixadas em um arquivo de dependências, os parâmetros dos experimentos foram reunidos em um único arquivo de configuração e uma semente aleatória global foi adotada em todas as etapas estocásticas. As sessões foram armazenadas em arquivos JSON identificados pela data e hora da coleta.
+
+% ---------------------------------------------------------------------
+\section{Visão geral da abordagem}
+
+A abordagem compreende duas fontes de dados e um protocolo único de avaliação. A primeira fonte é o conjunto de sessões humanas coletadas na interface descrita na \autoref{sec:coleta}, a partir do qual são extraídas as doze características da \autoref{sec:caracteristicas} e treinados os dois modelos de classificação de uma classe (\autoref{sec:treinamento}). A segunda fonte é um conjunto de sessões automatizadas, produzidas por um gerador de trajetórias sintéticas e executadas na mesma interface, no mesmo computador, por um bot de replay (\autoref{sec:bots}). Dessa forma, humanos e bots atravessam o mesmo mecanismo de captura e o mesmo processo de extração de características, e a única diferença entre as duas fontes é a origem do movimento do cursor.
+
+A avaliação (\autoref{sec:protocolo}) é organizada em quatro perguntas: (1) se cada modelo representa adequadamente o comportamento humano; (2) se cada modelo detecta interações automatizadas; (3) qual a influência de cada característica nos dois resultados anteriores; e (4) qual o compromisso entre a rejeição de humanos e a detecção de bots, e qual o custo computacional de cada modelo. A \autoref{fig:fluxo_coleta} apresenta o processo de coleta, geração, modelagem e treinamento, e a \autoref{fig:fluxo_avaliacao}, o processo de classificação e comparação dos modelos.
+
+% TODO: atualizar as Figuras 9 e 10 com o ramo "gerador -> bot de replay -> interface".
+
+% ---------------------------------------------------------------------
+\section{Interface gráfica e coleta de dados humanos}
+\label{sec:coleta}
+
+Foi desenvolvida uma interface gráfica com a biblioteca \textit{Tkinter} para simular um sistema de verificação do tipo CAPTCHA comportamental. A interface ocupa a tela inteira e exibe, em uma posição sorteada a cada sessão, um painel de $400 \times 250$ pixels com o título ``Verifique se é humano'', uma caixa de seleção (\textit{checkbox}) acompanhada do texto ``Autenticação'', instruções para que o usuário movimente o cursor e clique na caixa, e um contador de eventos capturados, conforme a \autoref{fig:interface}. Apenas o quadrado da caixa de seleção é clicável; o texto ao lado é um rótulo independente. O elemento alvo tem, portanto, as dimensões do quadrado, de \pendente{25 $\times$ 21} pixels no computador utilizado.
+
+Define-se como sessão de coleta $c$ o conjunto de eventos de movimento registrados desde a exibição do painel até o clique no elemento alvo. Formalmente, cada sessão é representada como uma sequência ordenada:
+\begin{equation}
+    S_c = \{(x_i, y_i, t_i)\}_{i=1}^{N}
+    \label{eq:sessao}
+\end{equation}
+em que $(x_i, y_i)$ é a posição do cursor e $t_i$ o instante associado ao evento $i$. A trajetória é orientada a eventos: cada evento de movimento entregue pelo sistema operacional à interface gera uma amostra, de modo que nem o número de eventos $N$ nem o intervalo entre eventos consecutivos são fixos. Quando o cursor permanece parado, nenhum evento é gerado. A comparação entre sessões de tamanhos diferentes é feita pelas características agregadas da \autoref{sec:caracteristicas}, que transformam qualquer sessão em um vetor de dimensão fixa.
+
+Todas as posições são registradas no referencial da janela, com origem no canto superior esquerdo da tela, calculadas a partir das coordenadas absolutas do cursor descontada a origem da janela. Esse cuidado é necessário porque, no \textit{Tkinter}, as coordenadas relativas de um evento são expressas em relação ao elemento sob o cursor (painel, moldura ou caixa de seleção), o que misturaria referenciais distintos em uma mesma trajetória.
+
+O clique é registrado no instante em que o botão do mouse é pressionado sobre o elemento alvo. Como a caixa de seleção só confirma a marcação quando o botão é solto, cerca de \pendente{100} ms depois, os eventos de movimento ocorridos entre pressionar e soltar o botão não pertencem à trajetória de aproximação ao alvo; eles são armazenados separadamente e desconsiderados na extração das características. O primeiro evento de movimento de cada sessão também é registrado.
+
+A coleta segue um fluxo contínuo: após o clique, a sessão é salva e a próxima é iniciada após uma pausa de 100 ms, com o painel em uma nova posição sorteada. Assim, cada trajetória parte do ponto em que o cursor se encontra ao início da sessão, isto é, próximo ao local do clique anterior, e o ponto inicial das trajetórias varia ao longo de toda a tela. O sorteio da posição do painel aumenta a variabilidade espacial das trajetórias e reduz o viés associado à memória motora. No início de cada execução da interface, o usuário informa nome e sobrenome para fins de identificação.
+
+Para cada sessão são armazenados os dados primários e os metadados listados na \autoref{tab:notacoes}. A velocidade e a aceleração são derivadas das posições e instantes por diferenças finitas:
+\begin{equation}
+    v_i = \frac{\sqrt{(x_i - x_{i-1})^2 + (y_i - y_{i-1})^2}}{t_i - t_{i-1}}
+    \label{eq:velocidade}
+\end{equation}
+\begin{equation}
+    a_i = \frac{v_i - v_{i-1}}{t_i - t_{i-1}}
+    \label{eq:aceleracao}
+\end{equation}
+
+\begin{table}[htb]
+    \centering
+    \caption{Notações utilizadas}
+    \label{tab:notacoes}
+    \begin{tabular}{ll}
+        \hline
+        Símbolo & Descrição \\
+        \hline
+        $P_i = (x_i, y_i)$ & Posição do cursor no evento $i$, no referencial da janela (pixels) \\
+        $t_i$ & Instante do evento $i$ (s) \\
+        $N$ & Número de eventos de movimento da sessão \\
+        $P_c = (x_c, y_c)$ & Posição do clique no elemento alvo \\
+        $t_c$ & Instante do clique \\
+        $C = (x_{\text{centro}}, y_{\text{centro}})$ & Centro do elemento alvo na sessão \\
+        $W$ & Largura do elemento alvo (pixels) \\
+        $w, h$ & Largura e altura da janela (pixels) \\
+        $v_i$, $a_i$ & Velocidade (pixels/s) e aceleração (pixels/s$^2$) no evento $i$ \\
+        $D$ & Distância total percorrida pelo cursor \\
+        $T$ & Duração da sessão, da exibição do painel ao clique \\
+        \hline
+    \end{tabular}
+    \fonte{Autoral (2026).}
+\end{table}
+
+\subsection{Dispositivo e conjunto de dados humanos}
+
+A coleta foi realizada por um único indivíduo, em um único computador: um notebook com sistema operacional Ubuntu 25.10, processador Intel Celeron N4020 de 1,10 GHz, 4 GB de memória e tela de $1366 \times 768$ pixels, o mesmo utilizado na execução do bot de replay e nos experimentos. O cursor foi controlado ora por mouse externo, ora pelo \textit{touchpad} do notebook, sem identificação do dispositivo em cada sessão. Os dados refletem, portanto, a variabilidade intraindividual do comportamento humano, sendo adequados para a análise comparativa entre padrões naturais e simulados, embora com limitações de generalização populacional (\autoref{sec:limitacoes}).
+
+Nesse computador, o intervalo mediano entre eventos consecutivos foi de \pendente{6,9} ms. Observou-se ainda que \pendente{4 a 7}\,\% dos intervalos são inferiores a 1 ms, com deslocamentos de dezenas de pixels entre eles, o que indica eventos entregues em rajada à interface, e não movimentos reais nesse intervalo de tempo; o tratamento desses casos é descrito na \autoref{sec:caracteristicas}. Como humanos e bots são capturados no mesmo computador, esse efeito atinge as duas fontes de dados da mesma forma.
+
+Foram coletadas \pendente{10.000} sessões. Antes da extração das características, foram excluídas as sessões em que o modo de tela cheia ainda não havia sido aplicado no momento do registro da janela, as sessões com duração superior a 5 s, atribuídas a distrações durante a coleta, e as sessões com menos de 10 eventos de movimento. O conjunto final contém \pendente{N} sessões humanas.
+
+\subsection{Versão anterior da coleta}
+
+Uma primeira versão da interface, utilizada em uma coleta anterior de 10.175 sessões, registrava as posições no referencial do elemento sob o cursor, conforme descrito acima. Em um teste de verificação, o cursor foi deslocado em linha reta horizontal sobre a janela, a uma altura constante de 206 pixels, e a interface registrou alturas de 14, 31 e 131 pixels, conforme o cursor passava sobre a caixa de seleção, a sua moldura e o painel. Em uma amostra de 600 sessões, 92\,\% apresentavam saltos superiores a 100 pixels em um único intervalo de aproximadamente 16 ms, sem correspondência com movimento real, e a posição do clique era registrada no referencial da caixa de seleção, o que tornava a característica $\text{dist}_{\text{clique}}$ praticamente constante. Por esse motivo, a interface foi corrigida e o conjunto de dados foi integralmente coletado de novo; as sessões da versão anterior não são utilizadas neste trabalho.
+
+% ---------------------------------------------------------------------
+\section{Preparação e modelagem das características}
+\label{sec:caracteristicas}
+
+Com o objetivo de tornar as variáveis comparáveis entre diferentes resoluções, todas as grandezas espaciais foram normalizadas pela diagonal da janela da sessão:
+\begin{equation}
+    d = \sqrt{w^2 + h^2}
+    \label{eq:diagonal}
+\end{equation}
+\begin{equation}
+    x' = \frac{x}{d}, \qquad y' = \frac{y}{d}
+    \label{eq:normalizacao}
+\end{equation}
+Os valores temporais foram mantidos em escala absoluta.
+
+Antes do cálculo das grandezas cinemáticas, foram descartadas as amostras cujo intervalo até a última amostra mantida é inferior a $\Delta t_{\min} = 1$ ms, colapsando os eventos entregues em rajada em um único ponto. Velocidade, aceleração e \textit{jerk} são recalculados a partir dessa sequência filtrada pelas \autoref{eq:velocidade} e \autoref{eq:aceleracao}.
+
+A partir dos dados primários, foram derivadas doze características envolvendo análises cinemáticas, de trajetória, de clique e de padrões temporais, organizadas em quatro grupos:
+
+\begin{description}
+    \item[Cinemática:] \textit{jerk} médio e desvio padrão do \textit{jerk}; razão entre distância e deslocamento; entropia da velocidade.
+    \item[Trajetória:] curvatura média e desvio padrão da curvatura; taxa de retrocessos.
+    \item[Clique:] tempo de reação; distância entre o clique e o centro do alvo; razão de velocidade de aproximação.
+    \item[Temporal:] desvio padrão temporal; entropia temporal.
+\end{description}
+
+\subsection{Características cinemáticas}
+
+O \textit{jerk} corresponde à derivada temporal da aceleração, representando a taxa de variação da aceleração ao longo do tempo, e reflete mudanças bruscas na dinâmica do movimento do cursor. Foram definidos o \textit{jerk} médio ($\text{jerk}_{\text{medio}}$) e o desvio padrão do \textit{jerk} ($\text{jerk}_{\text{dp}}$) de cada sessão:
+\begin{equation}
+    \text{jerk}[i] = \frac{a[i+1] - a[i]}{t[i+1] - t[i]}
+    \label{eq:jerk}
+\end{equation}
+\begin{equation}
+    \text{jerk}_{\text{medio}} = \text{mean}\left(|\text{jerk}|\right)
+    \label{eq:jerk_medio}
+\end{equation}
+\begin{equation}
+    \text{jerk}_{\text{dp}} = \text{std}\left(|\text{jerk}|\right)
+    \label{eq:jerk_dp}
+\end{equation}
+
+A razão entre distância e deslocamento ($\text{razao}_{\text{trajetoria}}$) compara o comprimento total do caminho percorrido pelo cursor com a distância euclidiana entre o primeiro evento e o último evento antes do clique, medindo o grau de desvio da trajetória em relação ao caminho mais curto possível:
+\begin{equation}
+    d_{\text{euclidiana}} = \sqrt{(x_{N} - x_1)^2 + (y_{N} - y_1)^2}
+    \label{eq:d_euclidiana}
+\end{equation}
+\begin{equation}
+    d_{\text{caminho}} = \sum_{i=1}^{N-1} \sqrt{(x_{i+1} - x_i)^2 + (y_{i+1} - y_i)^2}
+    \label{eq:d_caminho}
+\end{equation}
+\begin{equation}
+    \text{razao}_{\text{trajetoria}} = \frac{d_{\text{caminho}}}{d_{\text{euclidiana}}}
+    \label{eq:razao_trajetoria}
+\end{equation}
+
+A entropia da velocidade ($\text{entropia}_{\text{velocidade}}$) quantifica a imprevisibilidade do perfil de velocidade e permite diferenciar a variabilidade natural do movimento humano da regularidade de movimentos artificiais. Quanto maior a entropia, maior a variabilidade na distribuição das velocidades observadas durante o movimento. Foi utilizada a entropia de Shannon, amplamente empregada em Teoria da Informação para medir a aleatoriedade de uma fonte de dados \cite{magossi2021}. A distribuição de velocidades foi discretizada em $B = 20$ intervalos igualmente espaçados ao longo do seu domínio, e foi estimada a função de probabilidade empírica $p[k]$, correspondente à proporção de amostras pertencentes a cada intervalo:
+\begin{equation}
+    p[k] = \frac{f_k}{N_v}
+    \label{eq:prob_velocidade}
+\end{equation}
+\begin{equation}
+    \text{entropia}_{\text{velocidade}} = -\sum_{k=1}^{B} p[k] \log_2 p[k]
+    \label{eq:entropia_velocidade}
+\end{equation}
+em que $f_k$ é o número de observações de velocidade no intervalo $k$ e $N_v$ o número total de observações, adotando-se a convenção $0 \log_2 0 = 0$. A entropia não foi normalizada pelo seu valor máximo.
+
+\subsection{Características da trajetória}
+
+A curvatura da trajetória quantifica as mudanças de direção realizadas pelo cursor ao longo do movimento. A cada três pontos consecutivos $(P[i-1], P[i], P[i+1])$, foram definidos os vetores de deslocamento:
+\begin{equation}
+    \mathbf{v}_1 = P[i] - P[i-1]
+    \label{eq:v1}
+\end{equation}
+\begin{equation}
+    \mathbf{v}_2 = P[i+1] - P[i]
+    \label{eq:v2}
+\end{equation}
+e o ângulo local de mudança de direção:
+\begin{equation}
+    \theta[i] = \arccos\left(\frac{\mathbf{v}_1 \cdot \mathbf{v}_2}{|\mathbf{v}_1|\,|\mathbf{v}_2|}\right)
+    \label{eq:theta}
+\end{equation}
+\begin{equation}
+    \text{curvatura}_{\text{media}} = \text{mean}(\theta)
+    \label{eq:curvatura_media}
+\end{equation}
+\begin{equation}
+    \text{curvatura}_{\text{dp}} = \text{std}(\theta)
+    \label{eq:curvatura_dp}
+\end{equation}
+Pontos consecutivos coincidentes, para os quais o ângulo não é definido, são desconsiderados.
+
+Considerou-se a ocorrência de um retrocesso quando o deslocamento em um dos eixos apresenta inversão de sinal entre dois eventos consecutivos:
+\begin{equation}
+    dx[i] = x[i] - x[i-1], \qquad dy[i] = y[i] - y[i-1]
+    \label{eq:dx_dy}
+\end{equation}
+\begin{equation}
+    I_i =
+    \begin{cases}
+        1, & \text{se } dx[i] \cdot dx[i-1] < 0 \text{ ou } dy[i] \cdot dy[i-1] < 0 \\
+        0, & \text{caso contrário}
+    \end{cases}
+    \label{eq:inversao}
+\end{equation}
+\begin{equation}
+    n_{\text{retrocessos}} = \sum_{i=2}^{N} I_i
+    \label{eq:n_retrocessos}
+\end{equation}
+\begin{equation}
+    \text{taxa}_{\text{retrocesso}} = \frac{n_{\text{retrocessos}}}{N}
+    \label{eq:taxa_retrocesso}
+\end{equation}
+
+\subsection{Características de clique}
+
+O tempo de reação ($\text{tempo}_{\text{reacao}}$) corresponde ao intervalo entre o primeiro evento de movimento registrado e o clique:
+\begin{equation}
+    \text{tempo}_{\text{reacao}} = t_c - t_1
+    \label{eq:tempo_reacao}
+\end{equation}
+
+A distância do clique ao centro ($\text{dist}_{\text{clique}}$) é a distância euclidiana entre a posição do clique e o centro geométrico do elemento alvo na sessão. Como a posição do alvo é sorteada a cada sessão, o centro $C$ é lido dos metadados da própria sessão:
+\begin{equation}
+    \text{dist}_{\text{clique}} = \sqrt{(x_c - x_{\text{centro}})^2 + (y_c - y_{\text{centro}})^2}
+    \label{eq:dist_clique}
+\end{equation}
+
+A velocidade de aproximação corresponde à velocidade média nos $k = 5$ últimos movimentos registrados antes do clique:
+\begin{equation}
+    v_{\text{aproximacao}} = \text{mean}\left(v[N-k+1], \ldots, v[N]\right)
+    \label{eq:v_aproximacao}
+\end{equation}
+A característica utilizada nos modelos ($\text{vel}_{\text{aproximacao}}$) é a razão entre essa velocidade e a velocidade média $v_{\text{media}}$ de toda a trajetória:
+\begin{equation}
+    \text{vel}_{\text{aproximacao}} = \frac{v_{\text{aproximacao}}}{v_{\text{media}}}
+    \label{eq:vel_aproximacao}
+\end{equation}
+Valores inferiores a 1 indicam desaceleração durante a aproximação ao alvo, enquanto valores próximos ou superiores a 1 indicam manutenção ou aumento da velocidade nos instantes finais do movimento.
+
+\subsection{Características temporais}
+
+As características temporais quantificam a regularidade dos intervalos de tempo entre eventos consecutivos, calculados sobre a sequência filtrada por $\Delta t_{\min}$:
+\begin{equation}
+    \Delta t[i] = t[i+1] - t[i]
+    \label{eq:delta_t}
+\end{equation}
+
+O desvio padrão temporal ($\text{dp}_{\text{temporal}}$) quantifica a dispersão dos intervalos:
+\begin{equation}
+    \text{dp}_{\text{temporal}} = \sqrt{\text{mean}\left((\Delta t - \text{mean}(\Delta t))^2\right)}
+    \label{eq:dp_temporal}
+\end{equation}
+
+A entropia temporal ($\text{entropia}_{\text{temporal}}$) quantifica a imprevisibilidade dos intervalos. A série $\Delta t$ foi discretizada em $B = 20$ intervalos igualmente espaçados e a entropia de Shannon foi calculada sobre a distribuição empírica resultante:
+\begin{equation}
+    \text{entropia}_{\text{temporal}} = -\sum_{k=1}^{B} p[k] \log_2 p[k]
+    \label{eq:entropia_temporal}
+\end{equation}
+em que $p[k]$ é a proporção dos intervalos no intervalo $k$ da discretização.
+
+\subsection{Pré-processamento para os modelos}
+
+Antes do treinamento, cada característica foi limitada aos percentis 0,5 e 99,5 (winsorização) e padronizada pela média e pelo desvio padrão. Os limites da winsorização e os parâmetros da padronização foram estimados exclusivamente no conjunto de treinamento de cada partição da validação cruzada (\autoref{sec:protocolo}) e reaplicados, sem reajuste, às sessões de teste humanas e automatizadas. A winsorização impede que sessões extremas, frequentes em características de cauda pesada como $\text{razao}_{\text{trajetoria}}$ e $\text{jerk}_{\text{medio}}$, distorçam a padronização, e a padronização é necessária para o SVM de Uma Classe com \textit{kernel} RBF, que é sensível à escala das variáveis. O mesmo pré-processamento foi aplicado à Floresta de Isolamento, que, por particionar cada característica de forma independente, é praticamente invariante a essas transformações monotônicas; com isso, os dois modelos recebem exatamente as mesmas entradas.
+
+% ---------------------------------------------------------------------
+\section{Geração de interações automatizadas}
+\label{sec:bots}
+
+\subsection{Fundamentação}
+
+A ausência de um conjunto público de interações automatizadas compatível com a interface deste trabalho motivou a construção de um gerador próprio. O gerador reproduz o método baseado em conhecimento proposto por \citeonline{acien2022} para o \textit{benchmark} BeCAPTCHA-Mouse, no qual uma trajetória de mouse é definida por duas propriedades: a forma do caminho percorrido e o perfil de velocidade ao longo dele. Os autores combinam três formas (linear, quadrática e exponencial) com três perfis de velocidade (constante, aceleração crescente e aceleração seguida de desaceleração), obtendo nove famílias de trajetórias sintéticas, e mostram que o perfil de velocidade é o fator que mais aproxima a trajetória sintética do comportamento humano.
+
+Diferentemente do \textit{benchmark} original, cujas trajetórias contêm apenas coordenadas espaciais, neste trabalho as trajetórias sintéticas são executadas fisicamente na interface de captura por um bot, de modo que os instantes de cada evento são registrados pelo mesmo mecanismo utilizado para o usuário humano. Isso permite extrair as doze características da \autoref{sec:caracteristicas}, inclusive as temporais, sem qualquer adaptação. As trajetórias geradas por rede adversarial generativa (GAN) do \textit{benchmark} não são reprodutíveis sem o gerador treinado e não foram consideradas; a implicação dessa escolha é discutida na \autoref{sec:limitacoes}.
+
+\subsection{Gerador de trajetórias}
+
+Em \citeonline{acien2022}, as formas são definidas como funções $y = f(x)$ em coordenadas de tela. Neste trabalho, para que o gerador seja válido em qualquer direção de movimento, inclusive vertical, as formas foram definidas em um sistema de coordenadas local, determinado pelo ponto inicial $P_0$ e pelo ponto final $P_c$. Sejam $L = \|P_c - P_0\|$ o comprimento do segmento que os une, $\hat{u}$ o versor na direção $P_0 \to P_c$ e $\hat{v}$ o versor perpendicular. Com as coordenadas adimensionais $s = u/L \in [0, 1]$, que representa o avanço ao longo do segmento, e $z(s) = w/L$, que representa o desvio perpendicular, um ponto da trajetória é escrito como:
+\begin{equation}
+    P(s) = P_0 + s\,L\,\hat{u} + z(s)\,L\,\hat{v}
+    \label{eq:trajetoria_local}
+\end{equation}
+
+A forma da trajetória é definida pela função $z(s)$, que se anula nos dois extremos:
+\begin{description}
+    \item[Linear:] $z(s) = 0$.
+    \item[Quadrática:] $z(s) = a\,s\,(s - 1)$, em que o coeficiente $a$ controla a amplitude e o sentido da curvatura.
+    \item[Exponencial:] $z(s) = a \left[ \dfrac{e^{b s} - 1}{e^{b} - 1} - s \right]$, em que $b$ controla a assimetria, isto é, se o desvio se concentra no início ou no fim do movimento, e $a$ controla a amplitude.
+\end{description}
+Por serem adimensionais, os coeficientes $a$ e $b$ não dependem do comprimento da trajetória.
+
+O perfil de velocidade é definido pelo espaçamento dos $M$ pontos ao longo de $s$. Dados incrementos $d_i$, $i = 1, \ldots, M-1$, normalizados de modo que $\sum_i d_i = 1$, as posições são $s_1 = 0$ e $s_{i+1} = s_i + d_i$. Os três perfis são:
+\begin{description}
+    \item[Constante:] $d_i = 1/(M-1)$.
+    \item[Crescente (aceleração):] $d_i \propto \log(1 + i)$.
+    \item[Gaussiano (aceleração e desaceleração):] $d_i \propto \exp\left(-\dfrac{(i - M/2)^2}{2\sigma^2}\right)$, com $\sigma = (M-1)/4$.
+\end{description}
+Como o bot executa os pontos com intervalo de tempo controlado (\autoref{subsec:replay}), incrementos maiores correspondem a maior velocidade instantânea; o perfil gaussiano reproduz a aceleração inicial e a desaceleração final características do movimento humano descritas por \citeonline{acien2022}. Assim como no trabalho original, o espaçamento é definido ao longo do segmento $P_0 \to P_c$, e não do comprimento de arco; em formas de curvatura acentuada, a distância entre pontos consecutivos varia ligeiramente mesmo no perfil constante.
+
+Os parâmetros livres foram estimados a partir das sessões humanas, de forma a manter o gerador no mesmo domínio dos dados de treinamento:
+\begin{itemize}
+    \item \textbf{Coeficientes $a$ e $b$:} cada trajetória humana foi expressa no sistema local da \autoref{eq:trajetoria_local}, e as funções de forma foram ajustadas a ela por mínimos quadrados. Para a forma quadrática, $a$ tem solução fechada; para a exponencial, $b$ foi buscado em uma grade com passo 0,25 e limitado a $|b| \le \pendente{8}$, com $a$ em solução fechada para cada $b$. Uma parcela das trajetórias humanas tem o melhor ajuste no limite da grade, o que corresponde a um desvio concentrado em um dos extremos do movimento, como uma correção final. Os coeficientes das trajetórias sintéticas são sorteados da distribuição empírica dos ajustes, restrita aos percentis 5 e 95; na forma exponencial, $a$ e $b$ são sorteados como par, provenientes de uma mesma trajetória humana, por serem dependentes entre si. Foram consideradas no ajuste apenas as trajetórias com $L \geq 50$ pixels.
+    \item \textbf{Número de pontos $M$:} \citeonline{acien2022} sorteiam $M$ de uma distribuição normal com média e desvio padrão estimados por direção do movimento, já que músculos diferentes atuam em direções diferentes. Neste trabalho, as sessões humanas foram agrupadas por direção, em oito setores angulares, e por faixa de comprimento $L$, em tercis, e $M$ é sorteado de uma distribuição normal com a média e o desvio padrão da célula correspondente, com mínimo de 10 pontos. Células com menos de 30 sessões utilizam a estatística do setor de direção inteiro.
+    \item \textbf{Ponto inicial $P_0$:} é a posição do cursor no início da sessão, isto é, o local do clique da sessão anterior, exatamente como ocorre na coleta humana.
+    \item \textbf{Ponto final $P_c$:} é o centro do elemento alvo somado a um deslocamento sorteado da distribuição empírica do deslocamento do clique humano em relação ao centro, mantido dentro dos limites do alvo.
+\end{itemize}
+
+As nove famílias são identificadas pela nomenclatura do \textit{benchmark} original: forma $\in \{0: \text{linear}, 1: \text{quadrática}, 2: \text{exponencial}\}$ e perfil de velocidade $\in \{0: \text{constante}, 1: \text{crescente}, 2: \text{gaussiano}\}$. A \autoref{fig:gerador_exemplos} apresenta exemplos de cada família.
+
+\subsection{Bot de replay}
+\label{subsec:replay}
+
+O bot é um \textit{script} que utiliza a mesma interface da \autoref{sec:coleta}, com as mesmas dimensões, o mesmo sorteio da posição do painel e o mesmo registro em JSON, no mesmo computador da coleta humana. A cada sessão, o bot lê a posição do elemento alvo exibido, gera a trajetória da família correspondente entre $P_0$ e $P_c$, converte-a para coordenadas de tela e move o cursor ponto a ponto com a biblioteca \textit{pyautogui}, executando o clique no último ponto. A pausa automática que a biblioteca insere após cada comando foi desativada, para que o ritmo do movimento seja determinado apenas pelo intervalo planejado entre pontos. A interface registra a sessão no mesmo formato JSON das sessões humanas, acrescido da família, do nível de tempo e dos parâmetros sorteados.
+
+O intervalo de tempo entre pontos consecutivos é a única grandeza não definida pelo gerador e foi tratado como uma variável experimental com dois níveis:
+\begin{description}
+    \item[T0 --- intervalo fixo:] $\Delta t = 8$ ms entre todos os pontos, valor próximo ao intervalo mediano humano, representando um agente automatizado ingênuo, cuja regularidade temporal é a assinatura típica de \textit{scripts} de automação.
+    \item[T1 --- intervalo amostrado:] cada $\Delta t_i$ é sorteado, de forma independente, da distribuição empírica dos intervalos entre eventos das sessões humanas, excluídos os intervalos inferiores a $\Delta t_{\min}$, representando um agente que tenta mascarar a regularidade temporal.
+\end{description}
+Em ambos os níveis, o intervalo efetivamente registrado inclui a latência do sistema operacional e da interface, o que é intencional, pois o mesmo ocorreria com um agente real.
+
+\subsection{Conjunto de dados automatizados}
+
+Foram coletadas \pendente{150} sessões para cada uma das 9 famílias em cada um dos 2 níveis de tempo, totalizando \pendente{2.700} sessões automatizadas. A ordem de execução das sessões foi sorteada entre famílias e níveis, para que nenhuma condição ficasse concentrada em um trecho da coleta. As sessões foram verificadas quanto à integridade, com número mínimo de eventos e clique registrado sobre o elemento alvo, e submetidas à mesma extração de características das sessões humanas. Nenhuma sessão automatizada participa do treinamento dos modelos.
+
+% ---------------------------------------------------------------------
+\section{Configuração e treinamento dos modelos}
+\label{sec:treinamento}
+
+Foram implementadas duas abordagens de classificação de uma classe: o SVM de Uma Classe e a Floresta de Isolamento. Ambos foram treinados exclusivamente com sessões humanas, uma vez que o objetivo é modelar padrões de comportamento natural. O treinamento foi realizado com a biblioteca \textit{scikit-learn}, sobre as características pré-processadas conforme a \autoref{sec:caracteristicas}.
+
+O SVM de Uma Classe foi configurado para identificar a fronteira que melhor separa os dados humanos do restante do espaço de características. Os hiperparâmetros utilizados foram: \textit{kernel} RBF; para o parâmetro $\nu$, que controla a proporção máxima de anomalias aceitas pelo modelo, foram testados os valores 0,01, 0,05 e 0,1, e escolhido o valor 0,05; para o parâmetro \textit{gamma}, que controla a suavidade da fronteira de decisão, foi utilizado o valor \textit{auto}. A escolha dos hiperparâmetros utilizou apenas sessões humanas, e nenhuma sessão automatizada foi empregada nesse ajuste.
+
+A Floresta de Isolamento segue o princípio de isolar anomalias por meio de partições recursivas aleatórias. A configuração adotada foi: \textit{n\_estimators} = 250, o número de árvores; \textit{max\_samples} = 1,0, a fração de amostras utilizada para treinar cada árvore; e \textit{contamination} = \textit{auto}, pois, como o treinamento usa apenas humanos, a proporção de anomalias não é conhecida. Foi utilizada uma semente fixa em todos os experimentos, exceto no de estabilidade entre execuções (\autoref{subsec:p1}).
+
+Todos os resultados do \autoref{cap:resultados} provêm dos modelos treinados dentro do protocolo por partição da \autoref{subsec:particao}. Os modelos serializados com a biblioteca \textit{joblib}, treinados sobre o conjunto humano completo, são utilizados apenas na interface de demonstração.
+
+% ---------------------------------------------------------------------
+\section{Protocolo de avaliação}
+\label{sec:protocolo}
+
+As métricas e os procedimentos adotados seguem as recomendações da literatura de avaliação de classificadores de uma classe e de detecção de anomalias \cite{marques2023, demsar2006}.
+
+\subsection{Partição dos dados}
+\label{subsec:particao}
+
+As sessões humanas foram divididas aleatoriamente em $k = 5$ partições (\textit{folds}) de aproximadamente \pendente{2.000} sessões, com semente fixa. Em cada iteração, o pré-processamento e os modelos são ajustados com as quatro partições restantes e avaliados sobre (i) a partição humana retida e (ii) a totalidade das sessões automatizadas, que nunca participam do treinamento. Todas as métricas são reportadas como média e desvio padrão entre as cinco partições. Esse protocolo garante que humanos e bots sejam pontuados pelo mesmo modelo em cada iteração e evita a mistura de \textit{scores} obtidos por modelos distintos.
+
+\subsection{Métricas}
+
+Seja $s(x)$ o \textit{score} de decisão de um modelo para a sessão $x$, com a convenção de que valores abaixo do limiar $\tau$ indicam rejeição. Definem-se:
+\begin{itemize}
+    \item \textbf{Taxa de falsos positivos (FPR):} proporção de sessões humanas da partição retida rejeitadas pelo modelo:
+    \begin{equation}
+        \text{FPR} = \frac{FP}{FP + TN}
+        \label{eq:fpr}
+    \end{equation}
+    em que $FP$ é o número de sessões humanas rejeitadas e $TN$ o número de sessões humanas aceitas.
+    \item \textbf{Taxa de detecção (TPR):} proporção de sessões automatizadas rejeitadas:
+    \begin{equation}
+        \text{TPR} = \frac{TP}{TP + FN}
+        \label{eq:tpr}
+    \end{equation}
+    em que $TP$ é o número de sessões automatizadas rejeitadas e $FN$ o número de sessões automatizadas aceitas, calculada por família, por nível de tempo e no agregado.
+    \item \textbf{Área sob a curva ROC (AUC):} obtida variando $\tau$ sobre os \textit{scores} das sessões humanas retidas e das sessões automatizadas; mede a separação entre as classes independentemente do limiar.
+    \item \textbf{Taxa de erro igual (EER):} valor em que FPR e $1 - \text{TPR}$ se igualam; é a métrica utilizada por \citeonline{acien2022} e permite comparação direta com aquele trabalho.
+    \item \textbf{TPR a FPR fixa:} detecção obtida ao ajustar $\tau$ para FPR = 5\,\% na partição humana, correspondente ao ponto de operação adotado neste trabalho.
+\end{itemize}
+O limiar de operação padrão é o do próprio modelo ($\tau = 0$ na função de decisão do \textit{scikit-learn}), correspondente a $\nu = 0{,}05$ no SVM e a \textit{contamination} = \textit{auto} na Floresta.
+
+\subsection{Pergunta 1 --- Modelagem do comportamento humano}
+\label{subsec:p1}
+
+Avalia a qualidade com que cada modelo representa a classe normal, usando apenas as sessões humanas retidas:
+\begin{itemize}
+    \item \textbf{FPR e estabilidade entre partições:} FPR por partição e distribuição dos \textit{scores} de decisão em cada partição; a estabilidade é medida pelo desvio padrão das medianas e pela sobreposição dos intervalos interquartis entre as partições. Modelos com alta variância entre partições são sensíveis à composição do conjunto de treinamento, o que compromete a sua confiabilidade em um sistema CAPTCHA \cite{marques2023}.
+    \item \textbf{Estatísticas descritivas dos \textit{scores}:} média, mediana, desvio padrão, coeficiente de variação, assimetria, curtose e percentis 90, 95 e 99. Para comparação entre modelos de escalas distintas, utilizam-se as estatísticas independentes de escala, como assimetria, curtose e a razão $(P_{99} - P_{90}) / (P_{90} - \tilde{x})$.
+    \item \textbf{Distribuição dos \textit{scores}:} histograma e diagrama de caixa dos \textit{scores} de cada modelo, para analisar concentrações, assimetrias, a presença de sessões humanas atípicas e a relação com a fronteira de decisão \cite{scholkopf2001b, liu2008}.
+    \item \textbf{Estabilidade entre execuções:} avaliada apenas para a Floresta de Isolamento, que é estocástica devido à seleção aleatória das amostras e das partições na construção das árvores; o SVM de Uma Classe é determinístico para um mesmo conjunto de dados e hiperparâmetros. A Floresta foi treinada com 30 sementes distintas, e a consistência entre execuções foi quantificada pela correlação de Spearman entre os vetores de \textit{scores} e pelo desvio padrão do \textit{score} atribuído a cada sessão.
+\end{itemize}
+
+\subsection{Pergunta 2 --- Detecção de interações automatizadas}
+
+Avalia a capacidade de cada modelo de rejeitar as sessões automatizadas: TPR no limiar de operação, AUC e EER, estratificados por forma, por perfil de velocidade e por nível de tempo. A estratificação permite verificar duas hipóteses derivadas de \citeonline{acien2022}: que o perfil de velocidade influencia mais a detecção do que a forma, e que a regularidade temporal do nível T0 torna a detecção trivial, enquanto o nível T1 é o que diferencia os modelos. Compara-se ainda a concordância das decisões binárias entre os dois modelos sobre humanos e sobre bots:
+\begin{equation}
+    \text{Concordância} = \frac{\text{sessões com a mesma classificação nos dois modelos}}{\text{total de sessões}}
+    \label{eq:concordancia}
+\end{equation}
+
+\subsection{Pergunta 3 --- Influência das características}
+
+Quatro análises, todas executadas dentro do protocolo por partição:
+\begin{enumerate}
+    \item \textbf{Separabilidade univariada:} para cada característica e cada família de bot, a AUC obtida usando a característica isolada como \textit{score}, sem treinamento de modelo. Os resultados são resumidos em um mapa de calor característica $\times$ família, acompanhado da distribuição de cada característica em humanos e bots.
+    \item \textbf{Ablação deixa-uma-fora:} retreino de cada modelo sem cada uma das doze características, registrando FPR, TPR e AUC.
+    \item \textbf{Modelos de uma característica:} retreino de cada modelo com uma única característica, registrando a AUC por família, para medir o poder discriminativo isolado de cada característica dentro de cada algoritmo.
+    \item \textbf{Ablação por grupo:} retreino sem cada um dos quatro grupos (cinemático, trajetória, clique e temporal), para avaliar se é possível dispensar um grupo inteiro sem perda relevante de detecção.
+\end{enumerate}
+Por fim, calcula-se a correlação de Spearman entre os rankings de importância das características nos dois modelos.
+
+\subsection{Pergunta 4 --- Compromisso e custo computacional}
+
+Para cada modelo, constrói-se a curva ROC média das cinco partições e as curvas de FPR e TPR em função do parâmetro de rigidez da fronteira, $\nu$ no SVM de Uma Classe e \textit{contamination} na Floresta de Isolamento \cite{scholkopf2001b, liu2008}, variados no intervalo $[0{,}01;\,0{,}20]$ com passo 0,01. As curvas indicam qual modelo oferece maior controle sobre o equilíbrio entre segurança e usabilidade.
+
+O custo computacional é medido pelo tempo de treinamento, pelo tempo médio de inferência por sessão (média e desvio padrão de 30 repetições, com a biblioteca \textit{timeit}, em CPU) e pelo tamanho do modelo serializado em disco. Os experimentos foram conduzidos no mesmo computador da coleta, descrito na \autoref{sec:coleta}.
+
+% ---------------------------------------------------------------------
+\section{Limitações}
+\label{sec:limitacoes}
+
+O uso combinado de um modelo baseado em margens, o SVM de Uma Classe, e de um modelo baseado em partições aleatórias, a Floresta de Isolamento, permite avaliar diferentes perspectivas sobre o mesmo problema. Porém, por se tratar de classificação de uma classe, os modelos aprendem apenas a distribuição do comportamento humano legítimo e não são expostos a exemplos de agentes automatizados durante o treinamento.
+
+As interações automatizadas utilizadas na avaliação são sintéticas e baseadas em conhecimento, reproduzindo o método de \citeonline{acien2022}. Não foram avaliadas trajetórias geradas por modelos adversariais nem agentes que aprendem a partir de dados humanos reais, que representam o pior caso para sistemas de uma classe: em \citeonline{acien2022}, um SVM de uma classe treinado apenas com amostras humanas obteve taxa de erro igual entre 34,7\,\% e 40,1\,\% contra o conjunto completo de ataques. Os resultados obtidos devem, portanto, ser lidos como uma avaliação contra agentes de sofisticação baixa a intermediária. Além disso, os parâmetros do gerador foram estimados a partir do mesmo indivíduo que forneceu os dados de treinamento, o que torna os bots mais próximos do domínio dos modelos do que seriam bots construídos por um atacante sem acesso a esses dados.
+
+Outra limitação refere-se à coleta de dados. O conjunto foi obtido a partir de um único indivíduo, o que implica baixa variabilidade interindividual; o modelo pode não capturar a diversidade natural de padrões motores presentes na população, afetando a sua capacidade de generalização. A repetição da mesma tarefa milhares de vezes também tende a tornar o movimento mais regular do que o de um usuário ocasional.
+
+Por fim, a coleta foi realizada em um único computador, com mouse e \textit{touchpad} utilizados alternadamente e sem identificação do dispositivo em cada sessão, o que impede a análise separada dos dois dispositivos de entrada. Fatores relacionados ao \textit{hardware} e ao ambiente de execução, como a taxa de amostragem do dispositivo, a sensibilidade do cursor, a resolução da tela e a forma de entrega dos eventos pelo sistema operacional, influenciam diretamente as medidas derivadas, especialmente as baseadas em derivadas temporais, como velocidade, aceleração e \textit{jerk}. Como humanos e bots foram capturados no mesmo computador, esses fatores não favorecem nenhuma das duas fontes de dados, mas os modelos treinados não devem ser transferidos para outro dispositivo sem nova avaliação.

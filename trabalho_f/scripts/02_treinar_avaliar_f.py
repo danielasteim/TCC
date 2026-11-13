@@ -9,6 +9,8 @@ Em cada partição, os dois modelos (Pipeline: ResiduoFitts -> WinsorizadorF
 -> StandardScaler -> modelo) são ajustados só com os humanos de treino e
 aplicados:
   - aos humanos de teste  -> taxa de falsos positivos (FPR, humanos rejeitados);
+    o limiar de decisão é calibrado em cada partição para rejeitar
+    config["fpr_alvo"] dos humanos de TREINO (mesmo ponto de operação nos dois);
   - às sessões de bots, se existirem -> taxa de detecção por família e AUC-ROC
     (humanos de teste x bots, pelo escore de decisão).
 
@@ -137,25 +139,39 @@ def avaliar(H: pd.DataFrame, B: pd.DataFrame, config: dict, colunas=None, guarda
     for particao, (tr, te) in enumerate(kf.split(H)):
         preds_particao = {}
         for nome in MODELOS:
-            modelo = montar_modelo(nome, config, colunas).fit(H.iloc[tr][COLUNAS_EXTRAIDAS])
-            ph = modelo.predict(H.iloc[te][COLUNAS_EXTRAIDAS])
-            linha = {"modelo": nome, "particao": particao, "fpr": float(np.mean(ph == -1))}
+            Xtr, Xte = H.iloc[tr][COLUNAS_EXTRAIDAS], H.iloc[te][COLUNAS_EXTRAIDAS]
+            modelo = montar_modelo(nome, config, colunas).fit(Xtr)
+            limiar = calibrar_limiar(modelo, Xtr, config["fpr_alvo"])
+            fh = modelo.decision_function(Xte)
+            ph = np.where(fh < limiar, -1, 1)
+            linha = {"modelo": nome, "particao": particao, "limiar": limiar,
+                     "fpr": float(np.mean(ph == -1)),
+                     "fpr_limiar_padrao": float(np.mean(fh < 0))}
             preds_particao[nome] = {"humanos": ph}
             if XB is not None:
-                pb = modelo.predict(XB)
+                fb = modelo.decision_function(XB)
+                pb = np.where(fb < limiar, -1, 1)
                 linha["deteccao"] = float(np.mean(pb == -1))
+                linha["deteccao_limiar_padrao"] = float(np.mean(fb < 0))
                 for familia, idx in B.groupby("familia").indices.items():
                     linha[f"det:{familia}"] = float(np.mean(pb[idx] == -1))
-                # escore de anormalidade: quanto maior, mais "bot"
-                sh = -modelo.decision_function(H.iloc[te][COLUNAS_EXTRAIDAS])
-                sb = -modelo.decision_function(XB)
-                rotulos = np.r_[np.zeros(len(sh)), np.ones(len(sb))]
-                linha["auc"] = float(roc_auc_score(rotulos, np.r_[sh, sb]))
+                # escore de anormalidade: quanto maior, mais "bot" (não depende do limiar)
+                rotulos = np.r_[np.zeros(len(fh)), np.ones(len(fb))]
+                linha["auc"] = float(roc_auc_score(rotulos, -np.r_[fh, fb]))
                 preds_particao[nome]["bots"] = pb
             linhas.append(linha)
         if guardar_predicoes:
             predicoes.append(preds_particao)
     return pd.DataFrame(linhas), predicoes
+
+
+def calibrar_limiar(modelo: Pipeline, X_treino: pd.DataFrame, fpr_alvo: float) -> float:
+    """
+    Limiar do escore de decisão que rejeita a fração fpr_alvo dos humanos de
+    treino: o quantil fpr_alvo de f(x). Iguala o ponto de operação dos dois
+    modelos, que nos limiares padrão (f(x) < 0) rejeitam frações diferentes.
+    """
+    return float(np.quantile(modelo.decision_function(X_treino), fpr_alvo))
 
 
 def resumir(df: pd.DataFrame) -> pd.DataFrame:
@@ -255,12 +271,15 @@ def principal():
     destino_modelos = Path(args.modelos)
     destino_modelos.mkdir(parents=True, exist_ok=True)
     for nome in MODELOS:
-        joblib.dump(montar_modelo(nome, config).fit(H[COLUNAS_EXTRAIDAS]), destino_modelos / f"{nome}_f.joblib")
+        final = montar_modelo(nome, config).fit(H[COLUNAS_EXTRAIDAS])
+        limiar = calibrar_limiar(final, H[COLUNAS_EXTRAIDAS], config["fpr_alvo"])
+        joblib.dump({"modelo": final, "limiar": limiar}, destino_modelos / f"{nome}_f.joblib")
 
     print("\nResumo (média ± desvio entre partições):")
     for nome, rotulo in MODELOS.items():
         r = resumo.loc[nome]
-        texto = f"  {rotulo}: FPR {r['fpr_mean']:.3f} ± {r['fpr_std']:.3f}"
+        texto = (f"  {rotulo}: FPR {r['fpr_mean']:.3f} ± {r['fpr_std']:.3f}"
+                 f" (limiar padrão: {r['fpr_limiar_padrao_mean']:.3f})")
         if B is not None:
             texto += (f" | detecção {r['deteccao_mean']:.3f} ± {r['deteccao_std']:.3f}"
                       f" | AUC {r['auc_mean']:.3f} ± {r['auc_std']:.3f}")

@@ -1,0 +1,33 @@
+caso,tipo,modelo,fpr,delta_fpr
+sem razao_trajetoria,caracteristica,svm,0.0553768115942029,-0.001999150424787599
+sem razao_trajetoria,caracteristica,floresta,0.04987906046976512,-0.0002998000999500233
+sem desvio_maximo,caracteristica,svm,0.05647651174412793,-0.0008994502748625663
+sem desvio_maximo,caracteristica,floresta,0.050178960519740134,9.995002499263439e-08
+sem curvatura_media,caracteristica,svm,0.05477736131934032,-0.0025986006996501776
+sem curvatura_media,caracteristica,floresta,0.05007901049475262,-9.985007496252085e-05
+sem jerk_adimensional,caracteristica,svm,0.05747586206896552,9.990004997502411e-05
+sem jerk_adimensional,caracteristica,floresta,0.04947916041979011,-0.0006997001499250352
+sem n_submovimentos,caracteristica,svm,0.05637641179410295,-0.000999550224887548
+sem n_submovimentos,caracteristica,floresta,0.05037866066966516,0.00019980009995002046
+sem razao_pico_media,caracteristica,svm,0.05777601199400299,0.0004000499750124939
+sem razao_pico_media,caracteristica,floresta,0.050178760619690156,-9.99500249856955e-08
+sem entropia_velocidade,caracteristica,svm,0.05847581209395303,0.0010998500749625287
+sem entropia_velocidade,caracteristica,floresta,0.04947886056971514,-0.0006999999999999992
+sem residuo_fitts,caracteristica,svm,0.056076511744127935,-0.0012994502748625639
+sem residuo_fitts,caracteristica,floresta,0.05017906046976513,1.9990004998526878e-07
+sem instante_pico,caracteristica,svm,0.05627701149425287,-0.0010989505247376297
+sem instante_pico,caracteristica,floresta,0.050279060469765116,0.00010019990004997426
+sem desaceleracao_final,caracteristica,svm,0.05667626186906547,-0.0006997001499250283
+sem desaceleracao_final,caracteristica,floresta,0.05027901049475263,0.00010014992503748488
+sem dist_clique,caracteristica,svm,0.05587711144427786,-0.0014988505747126415
+sem dist_clique,caracteristica,floresta,0.05057851074462769,0.0003996501749125511
+sem tempo_parado,caracteristica,svm,0.05487691154422789,-0.002499050474762607
+sem tempo_parado,caracteristica,floresta,0.05067861069465267,0.0004997501249375258
+sem grupo geometricas,grupo,svm,0.05467736131934033,-0.0026986006996501666
+sem grupo geometricas,grupo,floresta,0.050079510244877556,-9.935032483758544e-05
+sem grupo cinematicas,grupo,svm,0.05597611194402798,-0.0013998500749625165
+sem grupo cinematicas,grupo,floresta,0.05047861069465267,0.000299750124937527
+sem grupo temporais,grupo,svm,0.05517726136931535,-0.002198700649675152
+sem grupo temporais,grupo,floresta,0.05057911044477761,0.0004002498750624653
+sem grupo aproximacao_clique,grupo,svm,0.05557706146926537,-0.0017989005497251326
+sem grupo aproximacao_clique,grupo,floresta,0.04957936031984008,-0.000599500249875061
