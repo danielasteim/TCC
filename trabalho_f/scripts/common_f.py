@@ -16,10 +16,13 @@ import yaml
 # trabalho_f/scripts/common_f.py -> RAIZ é a pasta do TCC, PASTA_F é trabalho_f/
 PASTA_F = Path(__file__).resolve().parents[1]
 RAIZ = PASTA_F.parent
-# append (e não insert) para que o math.py da raiz não sombreie nada
+# RAIZ no sys.path para o 03_bot_replay_f.py importar o coletor (data_collection.py)
 sys.path.append(str(RAIZ))
 
-from features import Features  # noqa: E402
+# Sessões do coletor v1 (v1/captcha_data) não salvam o tamanho da janela nem
+# o alvo: usam a janela fixa de 500 x 400 px e o checkbox medido no layout.
+JANELA_V1 = (500, 400)
+CENTRO_ALVO_V1 = (172.0, 204.0)
 
 FAMILIAS_FORMA = {0: "linear", 1: "quadratica", 2: "exponencial"}
 FAMILIAS_PERFIL = {0: "constante", 1: "crescente", 2: "gaussiano"}
@@ -51,13 +54,15 @@ def carregar_sessoes(diretorio: Path, limite: int = None, semente: int = 0):
 
 def tamanho_janela(sessao: dict):
     tamanho = sessao.get("window_size", {})
-    return (tamanho.get("width", Features.WINDOW_WIDTH),
-            tamanho.get("height", Features.WINDOW_HEIGHT))
+    return (tamanho.get("width", JANELA_V1[0]),
+            tamanho.get("height", JANELA_V1[1]))
 
 
 def centro_alvo(sessao: dict):
-    cx, cy, _ = Features()._geometria_alvo(sessao)
-    return np.array([cx, cy], dtype=float)
+    alvo = sessao.get("target")
+    if alvo:
+        return np.array([alvo["center_x"], alvo["center_y"]], dtype=float)
+    return np.array(CENTRO_ALVO_V1, dtype=float)
 
 
 def pontos_e_tempos(sessao: dict):
