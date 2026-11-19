@@ -55,8 +55,8 @@ gerador:
 
 # Bot de replay (03_bot_replay_f.py)
 replay:
-  sessoes_por_celula: 150   # por família (forma x perfil) e por nível de tempo
-  niveis_tempo: [T0, T1]
+  sessoes_por_celula: 100   # por família (forma x perfil) e por nível de tempo
+  niveis_tempo: [T0, T1]    # T0: Δt fixo e clique imediato; T1: Δt e pausa antes do clique sorteados dos humanos
   dt_T0_ms: 7               # T0: intervalo fixo entre pontos (≈ mediana humana de Δt, 6,8 ms)
   atraso_inicio_ms: 150     # espera após o painel aparecer, antes de mover
   limite_sessao_s: 10       # se a sessão não salvar nesse tempo, refaz

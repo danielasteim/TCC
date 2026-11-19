@@ -239,13 +239,14 @@ class Captcha:
         )
         checkbox_texto.pack(side='left', padx=(4, 0))
 
-        # Icone
-        icon_label = tk.Label(
-            checkbox_frame,
-            text="👻",
-            font=('Arial', 24),
-            bg='#ffffff'
-        )
+        # Icone: o Tkinter no Windows desenha emoji só em contorno, então a
+        # raposa colorida vem de uma imagem (trabalho_f/raposa_f.png)
+        caminho_icone = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'trabalho_f', 'raposa_f.png')
+        if os.path.exists(caminho_icone):
+            self.imagem_icone = tk.PhotoImage(file=caminho_icone)  # referência guardada para não sumir
+            icon_label = tk.Label(checkbox_frame, image=self.imagem_icone, bg='#ffffff')
+        else:
+            icon_label = tk.Label(checkbox_frame, text="🦊", font=('Arial', 24), bg='#ffffff')
         icon_label.pack(side='right', padx=10)
 
         # Status da interação

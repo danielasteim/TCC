@@ -10,6 +10,7 @@ trajetórias (seção 3.5.2) e salva em trabalho_f/resultados/params_humanos.jso
   - M (número de eventos): média e desvio por direção (8 setores, como em
     Acien et al., 2022) x faixa de comprimento L (tercis)
   - Δt entre eventos: função quantil empírica (usada no nível T1 do replay)
+  - pausa entre o último movimento e o clique (também usada no nível T1)
   - forma quadrática: distribuição de a
   - forma exponencial: distribuição de a e b (e os pares (a, b))
 
@@ -53,7 +54,7 @@ def estimar(diretorio, config, limite=None):
     grade_b = np.arange(est["grade_b"][0], est["grade_b"][1] + 1e-9, est["grade_b"][2])
     grade_b = grade_b[np.abs(grade_b) > 1e-9]
 
-    p0_rel, alvo_rel, desloc, dts = [], [], [], []
+    p0_rel, alvo_rel, desloc, dts, pausas = [], [], [], [], []
     linhas_M = []  # (setor, L, M)
     a_quad, pares_exp, r2_quad, r2_exp = [], [], [], []
     larguras, alturas, versoes = [], [], set()
@@ -79,6 +80,10 @@ def estimar(diretorio, config, limite=None):
         alvo_rel.append([alvo[0] / largura, alvo[1] / altura])
         desloc.append((pc - alvo).tolist())
         dts.append(np.diff(tempos))
+        # pausa antes do clique: do último evento de movimento (até o clique) ao clique
+        instante_clique = sessao.get("click_data", {}).get("click_timestamp")
+        if instante_clique is not None and np.any(tempos <= instante_clique):
+            pausas.append(float(instante_clique - tempos[tempos <= instante_clique][-1]))
 
         L = float(np.linalg.norm(pc - p0))
         linhas_M.append((setor_direcao(p0, pc, est["n_direcoes"]), L, len(pontos)))
@@ -154,6 +159,11 @@ def estimar(diretorio, config, limite=None):
             "quantis_s_min_1ms": np.percentile(dts[dts >= 0.001], np.linspace(0, 100, 1001)).round(6).tolist(),
             "mediana_ms_min_1ms": float(np.median(dts[dts >= 0.001]) * 1000),
         },
+        # pausa entre o último movimento e o clique (sorteada no nível T1 do replay)
+        "pausa_clique": {
+            "mediana_ms": float(np.median(pausas) * 1000),
+            "quantis_s": np.percentile(pausas, np.linspace(0, 100, 1001)).round(6).tolist(),
+        },
         "quadratica": {
             "a": _resumo(a_quad, p_inf, p_sup),
             "r2_mediano": float(np.median(r2_quad)) if r2_quad else None,
@@ -192,6 +202,7 @@ def principal():
     print(f"M: média {M['geral']['media']:.1f}, desvio {M['geral']['desvio']:.1f}, "
           f"faixas de L (px): {[round(x) for x in M['limites_L']]}")
     print(f"Δt: média {params['dt']['geral']['media_ms']:.1f} ms, mediana {params['dt']['geral']['mediana_ms']:.1f} ms")
+    print(f"Pausa antes do clique: mediana {params['pausa_clique']['mediana_ms']:.0f} ms")
     print(f"Quadrática  a: p5 {q['a']['p5']:.3f}  p50 {q['a']['p50']:.3f}  p95 {q['a']['p95']:.3f}  "
           f"(R² mediano {q['r2_mediano']:.2f}, n={q['a']['n']})")
     print(f"Exponencial a: p5 {e['a']['p5']:.3f}  p50 {e['a']['p50']:.3f}  p95 {e['a']['p95']:.3f}")

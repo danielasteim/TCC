@@ -12,8 +12,9 @@ A cada sessão:
      os humanos;
   3. M, a e b são sorteados de params_humanos.json e a trajetória é gerada
      pela família (forma, perfil) da vez (gerador_f.py);
-  4. os pontos são executados com intervalo fixo (T0) ou sorteado da
-     distribuição humana de Δt (T1), e o clique é feito no último ponto;
+  4. os pontos são executados com intervalo fixo e clique imediato (T0) ou
+     com Δt e pausa antes do clique sorteados das distribuições humanas (T1),
+     e o clique é feito no último ponto;
   5. a interface salva o JSON no formato humano, com os campos extras
      shape, vp, timing e bot_params.
 
@@ -21,7 +22,9 @@ As sessões são executadas em ordem aleatória (semente fixa) entre famílias e
 níveis, para que nenhuma condição fique concentrada num trecho da execução.
 Se for interrompido, retoma de onde parou (conta o que já está salvo).
 
-Requer sessão gráfica X11 no Linux (pyautogui não move o cursor no Wayland).
+No Windows, o cursor é movido por SendInput (ver mover_cursor); no Linux,
+requer sessão gráfica X11 (pyautogui não move o cursor no Wayland).
+A resolução da tela deve ser a mesma da coleta humana (1366x768, escala 100%).
 Esc encerra; mover o mouse para um canto da tela também (failsafe do pyautogui).
 
 Uso:
@@ -31,7 +34,9 @@ Uso:
 
 import argparse
 import csv
+import ctypes
 import json
+import sys
 import threading
 import time
 import tkinter as tk
@@ -49,6 +54,38 @@ from data_collection import Captcha  # noqa: E402  (RAIZ já está no sys.path v
 pyautogui.PAUSE = 0  # sem a pausa padrão de 0,1 s depois de cada comando
 
 
+# No Windows, pyautogui.moveTo usa SetCursorPos, e o sistema agrupa esses
+# movimentos na taxa de atualização da tela (~60 Hz, Δt ≈ 16,7 ms), perdendo
+# a maior parte dos pontos planejados. SendInput injeta o movimento na fila de
+# entrada como um mouse físico, e cada ponto chega à interface no horário planejado.
+if sys.platform == "win32":
+    from ctypes import wintypes
+
+    class _EntradaMouse(ctypes.Structure):
+        _fields_ = [("dx", wintypes.LONG), ("dy", wintypes.LONG), ("mouseData", wintypes.DWORD),
+                    ("dwFlags", wintypes.DWORD), ("time", wintypes.DWORD), ("dwExtraInfo", ctypes.c_size_t)]
+
+    class _UniaoEntrada(ctypes.Union):
+        _fields_ = [("mi", _EntradaMouse), ("reserva", ctypes.c_byte * 32)]
+
+    class _Entrada(ctypes.Structure):
+        _anonymous_ = ("u",)
+        _fields_ = [("type", wintypes.DWORD), ("u", _UniaoEntrada)]
+
+    _MOVE_ABSOLUTO = 0x0001 | 0x8000  # MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE
+
+    def mover_cursor(x, y):
+        """Move o cursor para (x, y) da tela via SendInput (coordenadas normalizadas 0..65535)."""
+        largura, altura = pyautogui.size()
+        entrada = _Entrada(type=0)  # INPUT_MOUSE
+        entrada.mi = _EntradaMouse(round(x * 65535 / (largura - 1)), round(y * 65535 / (altura - 1)),
+                                   0, _MOVE_ABSOLUTO, 0, 0)
+        ctypes.windll.user32.SendInput(1, ctypes.byref(entrada), ctypes.sizeof(_Entrada))
+else:
+    def mover_cursor(x, y):
+        pyautogui.moveTo(x, y)
+
+
 def _esperar_ate(instante):
     """Dorme até `instante` (perf_counter) com precisão de ~0,1 ms."""
     restante = instante - time.perf_counter()
@@ -58,14 +95,15 @@ def _esperar_ate(instante):
         pass
 
 
-def executar_trajetoria(pontos_tela, intervalos_s):
-    """Move o cursor ponto a ponto no horário planejado e clica no último ponto."""
+def executar_trajetoria(pontos_tela, intervalos_s, pausa_s=0.0):
+    """Move o cursor ponto a ponto no horário planejado, espera pausa_s parado e clica no último ponto."""
     instante = time.perf_counter()
-    pyautogui.moveTo(*pontos_tela[0])
+    mover_cursor(*pontos_tela[0])
     for ponto, dt in zip(pontos_tela[1:], intervalos_s):
         instante += dt
         _esperar_ate(instante)
-        pyautogui.moveTo(*ponto)
+        mover_cursor(*ponto)
+    _esperar_ate(instante + pausa_s)
     pyautogui.click()
 
 
@@ -78,6 +116,7 @@ class BotReplay(Captcha):
         self.replay = config["replay"]
         self.amostrador = AmostradorParametros(params, M_minimo=config["gerador"]["M_minimo"])
         self.quantis_dt = np.asarray(params["dt"]["quantis_s_min_1ms"])
+        self.quantis_pausa = np.asarray(params["pausa_clique"]["quantis_s"])
         self.pasta_trajetorias = pasta_trajetorias
         self.registro = []      # uma linha por sessão salva
         self.falhas = 0
@@ -111,6 +150,13 @@ class BotReplay(Captcha):
         u = rng.uniform(0, 1, n)
         return np.interp(u, np.linspace(0, 1, len(self.quantis_dt)), self.quantis_dt)
 
+    def _sortear_pausa(self, rng):
+        """T0: clica logo após o último ponto; T1: pausa sorteada da distribuição humana."""
+        if self.atual[2] == "T0":
+            return 0.0
+        q = self.quantis_pausa
+        return float(np.interp(rng.uniform(0, 1), np.linspace(0, 1, len(q)), q))
+
     def _iniciar_sessao_bot(self):
         forma, perfil, nivel, semente = self.atual = self.plano[0]
         rng = np.random.default_rng(semente)
@@ -130,6 +176,7 @@ class BotReplay(Captcha):
         a, b = self.amostrador.coeficientes(rng, forma)
         pontos = np.rint(trajetoria(p0, pc, forma, perfil, M, a, b))
         intervalos = self._sortear_intervalos(rng, M - 1)
+        pausa = self._sortear_pausa(rng)
 
         self.session_data["session_user"] = ["BOT"]
         self.session_data["shape"] = forma
@@ -141,6 +188,7 @@ class BotReplay(Captcha):
             "M": int(M), "a": float(a), "b": float(b), "L": L, "semente": list(semente),
             "p0": p0.tolist(), "pc": pc.tolist(),
             "dt_planejado_ms_media": float(intervalos.mean() * 1000),
+            "pausa_planejada_ms": pausa * 1000,
         }
 
         self.numero_trajetoria += 1
@@ -151,7 +199,7 @@ class BotReplay(Captcha):
         self.session_data["bot_params"]["trajetoria"] = nome
 
         pontos_tela = [tuple(int(v) for v in p + origem) for p in pontos]
-        threading.Thread(target=executar_trajetoria, args=(pontos_tela, intervalos), daemon=True).start()
+        threading.Thread(target=executar_trajetoria, args=(pontos_tela, intervalos, pausa), daemon=True).start()
 
         sessao = self.session_data["session_id"]
         self.root.after(int(self.replay["limite_sessao_s"] * 1000), self._verificar_travamento, sessao)
