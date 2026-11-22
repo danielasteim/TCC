@@ -17,7 +17,7 @@ painel do checkbox nesse ponto antes de executar a trajetória.
 
 Uso:
     python trabalho_f/scripts/01_gerar_trajetorias_f.py
-    python trabalho_f/scripts/01_gerar_trajetorias_f.py --params trabalho_f/resultados/params_teste_v1.json --n 20
+    python trabalho_f/scripts/01_gerar_trajetorias_f.py --params trabalho_f/resultados/params_humanos.json --n 20
 """
 
 import argparse
@@ -27,12 +27,12 @@ from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
+import matplotlib.pyplot as plt  
+import numpy as np  
 
-from common_f import (FAMILIAS_FORMA, FAMILIAS_PERFIL, RAIZ, caminho,  # noqa: E402
+from common_f import (FAMILIAS_FORMA, FAMILIAS_PERFIL, RAIZ, caminho,  
                       carregar_config, setor_direcao)
-from gerador_f import AmostradorParametros, trajetoria  # noqa: E402
+from gerador_f import AmostradorParametros, trajetoria  
 
 
 def _absoluto(p) -> Path:

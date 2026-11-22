@@ -1,0 +1,131 @@
+{
+  "session_id": "20261120_234847_909076",
+  "collector_version": 3,
+  "pause_between_sessions_ms": 100,
+  "session_user": [
+    "BOT"
+  ],
+  "mouse_movements": [
+    {
+      "x": 376,
+      "y": 211,
+      "time_offset": 0.19360613822937012
+    },
+    {
+      "x": 344,
+      "y": 258,
+      "time_offset": 0.2015058994293213
+    },
+    {
+      "x": 313,
+      "y": 304,
+      "time_offset": 0.20787978172302246
+    },
+    {
+      "x": 281,
+      "y": 351,
+      "time_offset": 0.21451377868652344
+    },
+    {
+      "x": 250,
+      "y": 398,
+      "time_offset": 0.22158312797546387
+    },
+    {
+      "x": 219,
+      "y": 445,
+      "time_offset": 0.22898030281066895
+    }
+  ],
+  "timestamps": [
+    1795229328.102676,
+    1795229328.1105757,
+    1795229328.1169496,
+    1795229328.1235836,
+    1795229328.130653,
+    1795229328.13805
+  ],
+  "velocities": [
+    7197.61958167412,
+    8702.814146450772,
+    8570.922811111961,
+    7964.347316820127,
+    7611.386008219996
+  ],
+  "accelerations": [
+    236150.35474754876,
+    236150.35474754876,
+    236150.35474754876,
+    236150.35474754876
+  ],
+  "click_data": {
+    "time_to_click": 0.2598609924316406,
+    "click_position": [
+      124,
+      585
+    ],
+    "click_timestamp": 1795229328.1689308
+  },
+  "total_time": 0.2598609924316406,
+  "distance_traveled": 281.79517088214465,
+  "window_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "screen_size": {
+    "width": 1366,
+    "height": 768
+  },
+  "window_origin": {
+    "x": 0,
+    "y": 0
+  },
+  "dpi_scale": 100,
+  "target": {
+    "x": 116,
+    "y": 573,
+    "width": 24,
+    "height": 21,
+    "center_x": 128.0,
+    "center_y": 583.5
+  },
+  "shape": 0,
+  "vp": 0,
+  "timing": "T0",
+  "bot_familia": "shape=0_vp=0_T0",
+  "bot_params": {
+    "M": 10,
+    "a": 0.0,
+    "b": 0.0,
+    "L": 506.9982741587983,
+    "semente": [
+      42,
+      0,
+      0,
+      0,
+      192
+    ],
+    "p0": [
+      407.0,
+      164.0
+    ],
+    "pc": [
+      124.5,
+      585.0
+    ],
+    "dt_planejado_ms_media": 7.0,
+    "pausa_planejada_ms": 0.0,
+    "trajetoria": "0132_shape=0_vp=0_timing=T0.txt"
+  },
+  "movements_after_click": [],
+  "metrics": {
+    "total_time": 0.2598609924316406,
+    "num_movements": 6,
+    "total_distance": 281.79517088214465,
+    "avg_velocity": 8009.417972855395,
+    "max_velocity": 8702.814146450772,
+    "avg_acceleration": 236150.35474754876,
+    "max_acceleration": 236150.35474754876,
+    "time_to_click": 0.2598609924316406
+  }
+}

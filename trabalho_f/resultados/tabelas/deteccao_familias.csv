@@ -1,0 +1,10 @@
+familia,floresta,svm
+shape=0_vp=0_T1,1.0,1.0
+shape=0_vp=1_T1,1.0,1.0
+shape=0_vp=2_T1,1.0,1.0
+shape=1_vp=0_T1,1.0,1.0
+shape=1_vp=1_T1,1.0,1.0
+shape=1_vp=2_T1,0.6,1.0
+shape=2_vp=0_T1,1.0,1.0
+shape=2_vp=1_T1,1.0,1.0
+shape=2_vp=2_T1,0.0,1.0

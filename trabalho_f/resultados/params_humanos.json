@@ -1,13 +1,13 @@
 {
  "origem": {
-  "diretorio": "C:\\Users\\Daniela Steim\\Documents\\TCC\\captcha_data_f",
+  "diretorio": "captcha_data_f",
   "sessoes_usadas": 10004,
   "sessoes_descartadas": 0,
   "versoes_coletor": [
    3
   ],
   "sessoes_no_ajuste_de_forma": 9846,
-  "gerado_em": "2026-11-18 14:10:06"
+  "gerado_em": "2026-11-20 18:13:01"
  },
  "janela": {
   "largura": 1366,

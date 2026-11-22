@@ -16,14 +16,21 @@ caminhos:
 
 # Pré-processamento e modelos (iguais aos do training.py)
 winsorizacao: [0.005, 0.995]
+n_humanos: 10000            # usa as N primeiras sessões humanas válidas, em ordem cronológica (null = todas)
 k_folds: 5
 fpr_alvo: 0.05              # limiar de decisão calibrado para rejeitar 5% dos humanos de treino
+nivel_principal: T1         # T0 e T1 são comparados uma vez; as demais análises usam só este nível
+variacao_bots:            # 05_avaliar_f.py: reamostra os bots do teste para cada prevalência
+  # bots / (bots + humanos de teste). O máximo é 0,45 porque o teste tem 1.800 bots T1
+  # para 2.000 humanos (prevalência natural de 47,4%).
+  prevalencias: [0.01, 0.05, 0.10, 0.25, 0.45]
+  repeticoes: 10            # sorteios por prevalência e por partição
 svm:
   kernel: rbf
   nu: 0.05
-  gamma: auto
+  gamma: scale
 floresta:
-  n_estimators: 250
+  n_estimators: 100
   max_samples: 256          # subamostra por árvore (padrão de Liu, Ting e Zhou, 2008)
   contamination: auto
 

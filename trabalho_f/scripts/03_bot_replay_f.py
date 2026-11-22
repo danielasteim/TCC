@@ -182,7 +182,7 @@ class BotReplay(Captcha):
         self.session_data["shape"] = forma
         self.session_data["vp"] = perfil
         self.session_data["timing"] = nivel
-        # lido por 02_treinar_avaliar_f.py para a detecção por família x nível
+        # lido por 05_avaliar_f.py para a detecção por família x nível
         self.session_data["bot_familia"] = f"shape={forma}_vp={perfil}_{nivel}"
         self.session_data["bot_params"] = {
             "M": int(M), "a": float(a), "b": float(b), "L": L, "semente": list(semente),

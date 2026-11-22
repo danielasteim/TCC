@@ -42,7 +42,7 @@ scikit-learn, antes do `WinsorizadorF` e do `StandardScaler`:
         ("fitts", ResiduoFitts()),
         ("winsor", WinsorizadorF(0.005, 0.995)),
         ("padronizacao", StandardScaler()),
-        ("svm", OneClassSVM(kernel="rbf", nu=0.05, gamma="auto")),
+        ("svm", OneClassSVM(kernel="rbf", nu=0.05, gamma="scale")),
     ])
     modelo.fit(X[COLUNAS_EXTRAIDAS])
 
