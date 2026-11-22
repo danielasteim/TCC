@@ -1,0 +1,289 @@
+caso,tipo,modelo,familia,tpr,delta_tpr
+sem razao_trajetoria,caracteristica,svm,shape=0_vp=0_T1,0.991,0.0
+sem razao_trajetoria,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem razao_trajetoria,caracteristica,svm,shape=0_vp=2_T1,0.931,0.02200000000000002
+sem razao_trajetoria,caracteristica,svm,shape=1_vp=0_T1,0.992,0.0029999999999998916
+sem razao_trajetoria,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem razao_trajetoria,caracteristica,svm,shape=1_vp=2_T1,0.873,0.03399999999999992
+sem razao_trajetoria,caracteristica,svm,shape=2_vp=0_T1,0.994,0.007000000000000117
+sem razao_trajetoria,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem razao_trajetoria,caracteristica,svm,shape=2_vp=2_T1,0.865,0.029000000000000026
+sem razao_trajetoria,caracteristica,floresta,shape=0_vp=0_T1,0.944,0.019999999999999907
+sem razao_trajetoria,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem razao_trajetoria,caracteristica,floresta,shape=0_vp=2_T1,0.813,0.30499999999999994
+sem razao_trajetoria,caracteristica,floresta,shape=1_vp=0_T1,0.841,-0.005999999999999894
+sem razao_trajetoria,caracteristica,floresta,shape=1_vp=1_T1,1.0,0.0010000000000000009
+sem razao_trajetoria,caracteristica,floresta,shape=1_vp=2_T1,0.688,0.2609999999999999
+sem razao_trajetoria,caracteristica,floresta,shape=2_vp=0_T1,0.829,0.004999999999999893
+sem razao_trajetoria,caracteristica,floresta,shape=2_vp=1_T1,0.993,-0.0019999999999998908
+sem razao_trajetoria,caracteristica,floresta,shape=2_vp=2_T1,0.725,0.20399999999999996
+sem desvio_maximo,caracteristica,svm,shape=0_vp=0_T1,0.9890000000000001,-0.0019999999999998908
+sem desvio_maximo,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem desvio_maximo,caracteristica,svm,shape=0_vp=2_T1,0.8640000000000001,-0.04499999999999993
+sem desvio_maximo,caracteristica,svm,shape=1_vp=0_T1,0.994,0.004999999999999893
+sem desvio_maximo,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem desvio_maximo,caracteristica,svm,shape=1_vp=2_T1,0.8400000000000001,0.0010000000000000009
+sem desvio_maximo,caracteristica,svm,shape=2_vp=0_T1,0.992,0.0050000000000001155
+sem desvio_maximo,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem desvio_maximo,caracteristica,svm,shape=2_vp=2_T1,0.873,0.03700000000000003
+sem desvio_maximo,caracteristica,floresta,shape=0_vp=0_T1,0.901,-0.02300000000000002
+sem desvio_maximo,caracteristica,floresta,shape=0_vp=1_T1,0.9960000000000001,-0.0039999999999998925
+sem desvio_maximo,caracteristica,floresta,shape=0_vp=2_T1,0.682,0.17400000000000004
+sem desvio_maximo,caracteristica,floresta,shape=1_vp=0_T1,0.8220000000000001,-0.0249999999999998
+sem desvio_maximo,caracteristica,floresta,shape=1_vp=1_T1,0.991,-0.008000000000000007
+sem desvio_maximo,caracteristica,floresta,shape=1_vp=2_T1,0.658,0.23099999999999998
+sem desvio_maximo,caracteristica,floresta,shape=2_vp=0_T1,0.789,-0.03500000000000003
+sem desvio_maximo,caracteristica,floresta,shape=2_vp=1_T1,0.986,-0.008999999999999897
+sem desvio_maximo,caracteristica,floresta,shape=2_vp=2_T1,0.6900000000000001,0.16900000000000004
+sem curvatura_media,caracteristica,svm,shape=0_vp=0_T1,0.986,-0.0050000000000000044
+sem curvatura_media,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem curvatura_media,caracteristica,svm,shape=0_vp=2_T1,0.754,-0.15500000000000003
+sem curvatura_media,caracteristica,svm,shape=1_vp=0_T1,0.9570000000000001,-0.03200000000000003
+sem curvatura_media,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem curvatura_media,caracteristica,svm,shape=1_vp=2_T1,0.588,-0.2510000000000001
+sem curvatura_media,caracteristica,svm,shape=2_vp=0_T1,0.977,-0.009999999999999898
+sem curvatura_media,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem curvatura_media,caracteristica,svm,shape=2_vp=2_T1,0.629,-0.20699999999999996
+sem curvatura_media,caracteristica,floresta,shape=0_vp=0_T1,0.9269999999999999,0.0029999999999998916
+sem curvatura_media,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem curvatura_media,caracteristica,floresta,shape=0_vp=2_T1,0.813,0.30499999999999994
+sem curvatura_media,caracteristica,floresta,shape=1_vp=0_T1,0.8140000000000001,-0.03299999999999981
+sem curvatura_media,caracteristica,floresta,shape=1_vp=1_T1,0.9960000000000001,-0.0029999999999998916
+sem curvatura_media,caracteristica,floresta,shape=1_vp=2_T1,0.665,0.238
+sem curvatura_media,caracteristica,floresta,shape=2_vp=0_T1,0.779,-0.04500000000000004
+sem curvatura_media,caracteristica,floresta,shape=2_vp=1_T1,0.984,-0.010999999999999899
+sem curvatura_media,caracteristica,floresta,shape=2_vp=2_T1,0.714,0.19299999999999995
+sem jerk_adimensional,caracteristica,svm,shape=0_vp=0_T1,0.985,-0.006000000000000005
+sem jerk_adimensional,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem jerk_adimensional,caracteristica,svm,shape=0_vp=2_T1,0.906,-0.0030000000000000027
+sem jerk_adimensional,caracteristica,svm,shape=1_vp=0_T1,0.982,-0.007000000000000117
+sem jerk_adimensional,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem jerk_adimensional,caracteristica,svm,shape=1_vp=2_T1,0.827,-0.012000000000000122
+sem jerk_adimensional,caracteristica,svm,shape=2_vp=0_T1,0.9879999999999999,0.0010000000000000009
+sem jerk_adimensional,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem jerk_adimensional,caracteristica,svm,shape=2_vp=2_T1,0.828,-0.008000000000000007
+sem jerk_adimensional,caracteristica,floresta,shape=0_vp=0_T1,0.9179999999999999,-0.006000000000000116
+sem jerk_adimensional,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem jerk_adimensional,caracteristica,floresta,shape=0_vp=2_T1,0.772,0.264
+sem jerk_adimensional,caracteristica,floresta,shape=1_vp=0_T1,0.808,-0.03899999999999981
+sem jerk_adimensional,caracteristica,floresta,shape=1_vp=1_T1,0.999,0.0
+sem jerk_adimensional,caracteristica,floresta,shape=1_vp=2_T1,0.639,0.21199999999999997
+sem jerk_adimensional,caracteristica,floresta,shape=2_vp=0_T1,0.7769999999999999,-0.04700000000000015
+sem jerk_adimensional,caracteristica,floresta,shape=2_vp=1_T1,0.998,0.0030000000000001137
+sem jerk_adimensional,caracteristica,floresta,shape=2_vp=2_T1,0.674,0.15300000000000002
+sem n_submovimentos,caracteristica,svm,shape=0_vp=0_T1,0.994,0.0030000000000000027
+sem n_submovimentos,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem n_submovimentos,caracteristica,svm,shape=0_vp=2_T1,0.917,0.008000000000000007
+sem n_submovimentos,caracteristica,svm,shape=1_vp=0_T1,0.991,0.0019999999999998908
+sem n_submovimentos,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem n_submovimentos,caracteristica,svm,shape=1_vp=2_T1,0.841,0.0019999999999998908
+sem n_submovimentos,caracteristica,svm,shape=2_vp=0_T1,0.983,-0.0039999999999998925
+sem n_submovimentos,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem n_submovimentos,caracteristica,svm,shape=2_vp=2_T1,0.8550000000000001,0.019000000000000128
+sem n_submovimentos,caracteristica,floresta,shape=0_vp=0_T1,0.9339999999999999,0.009999999999999898
+sem n_submovimentos,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem n_submovimentos,caracteristica,floresta,shape=0_vp=2_T1,0.717,0.20899999999999996
+sem n_submovimentos,caracteristica,floresta,shape=1_vp=0_T1,0.817,-0.029999999999999916
+sem n_submovimentos,caracteristica,floresta,shape=1_vp=1_T1,0.998,-0.0010000000000000009
+sem n_submovimentos,caracteristica,floresta,shape=1_vp=2_T1,0.587,0.15999999999999992
+sem n_submovimentos,caracteristica,floresta,shape=2_vp=0_T1,0.786,-0.038000000000000034
+sem n_submovimentos,caracteristica,floresta,shape=2_vp=1_T1,0.99,-0.004999999999999893
+sem n_submovimentos,caracteristica,floresta,shape=2_vp=2_T1,0.651,0.13
+sem razao_pico_media,caracteristica,svm,shape=0_vp=0_T1,0.991,0.0
+sem razao_pico_media,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem razao_pico_media,caracteristica,svm,shape=0_vp=2_T1,0.9280000000000002,0.019000000000000128
+sem razao_pico_media,caracteristica,svm,shape=1_vp=0_T1,0.985,-0.004000000000000115
+sem razao_pico_media,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem razao_pico_media,caracteristica,svm,shape=1_vp=2_T1,0.859,0.019999999999999907
+sem razao_pico_media,caracteristica,svm,shape=2_vp=0_T1,0.984,-0.0029999999999998916
+sem razao_pico_media,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem razao_pico_media,caracteristica,svm,shape=2_vp=2_T1,0.851,0.015000000000000013
+sem razao_pico_media,caracteristica,floresta,shape=0_vp=0_T1,0.9029999999999999,-0.02100000000000013
+sem razao_pico_media,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem razao_pico_media,caracteristica,floresta,shape=0_vp=2_T1,0.737,0.22899999999999998
+sem razao_pico_media,caracteristica,floresta,shape=1_vp=0_T1,0.775,-0.07199999999999984
+sem razao_pico_media,caracteristica,floresta,shape=1_vp=1_T1,0.986,-0.013000000000000012
+sem razao_pico_media,caracteristica,floresta,shape=1_vp=2_T1,0.609,0.18199999999999994
+sem razao_pico_media,caracteristica,floresta,shape=2_vp=0_T1,0.744,-0.08000000000000007
+sem razao_pico_media,caracteristica,floresta,shape=2_vp=1_T1,0.9800000000000001,-0.014999999999999791
+sem razao_pico_media,caracteristica,floresta,shape=2_vp=2_T1,0.663,0.14200000000000002
+sem entropia_velocidade,caracteristica,svm,shape=0_vp=0_T1,0.993,0.0020000000000000018
+sem entropia_velocidade,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem entropia_velocidade,caracteristica,svm,shape=0_vp=2_T1,0.889,-0.020000000000000018
+sem entropia_velocidade,caracteristica,svm,shape=1_vp=0_T1,0.992,0.0029999999999998916
+sem entropia_velocidade,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem entropia_velocidade,caracteristica,svm,shape=1_vp=2_T1,0.834,-0.0050000000000001155
+sem entropia_velocidade,caracteristica,svm,shape=2_vp=0_T1,0.986,-0.0009999999999998899
+sem entropia_velocidade,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem entropia_velocidade,caracteristica,svm,shape=2_vp=2_T1,0.829,-0.007000000000000006
+sem entropia_velocidade,caracteristica,floresta,shape=0_vp=0_T1,0.925,0.0010000000000000009
+sem entropia_velocidade,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem entropia_velocidade,caracteristica,floresta,shape=0_vp=2_T1,0.631,0.123
+sem entropia_velocidade,caracteristica,floresta,shape=1_vp=0_T1,0.805,-0.041999999999999815
+sem entropia_velocidade,caracteristica,floresta,shape=1_vp=1_T1,0.9890000000000001,-0.009999999999999898
+sem entropia_velocidade,caracteristica,floresta,shape=1_vp=2_T1,0.517,0.08999999999999997
+sem entropia_velocidade,caracteristica,floresta,shape=2_vp=0_T1,0.7809999999999999,-0.04300000000000015
+sem entropia_velocidade,caracteristica,floresta,shape=2_vp=1_T1,0.986,-0.008999999999999897
+sem entropia_velocidade,caracteristica,floresta,shape=2_vp=2_T1,0.591,0.06999999999999995
+sem residuo_fitts,caracteristica,svm,shape=0_vp=0_T1,0.991,0.0
+sem residuo_fitts,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem residuo_fitts,caracteristica,svm,shape=0_vp=2_T1,0.923,0.014000000000000012
+sem residuo_fitts,caracteristica,svm,shape=1_vp=0_T1,0.992,0.0029999999999998916
+sem residuo_fitts,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem residuo_fitts,caracteristica,svm,shape=1_vp=2_T1,0.8779999999999999,0.03899999999999981
+sem residuo_fitts,caracteristica,svm,shape=2_vp=0_T1,0.991,0.004000000000000115
+sem residuo_fitts,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem residuo_fitts,caracteristica,svm,shape=2_vp=2_T1,0.858,0.02200000000000002
+sem residuo_fitts,caracteristica,floresta,shape=0_vp=0_T1,0.916,-0.008000000000000007
+sem residuo_fitts,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem residuo_fitts,caracteristica,floresta,shape=0_vp=2_T1,0.813,0.30499999999999994
+sem residuo_fitts,caracteristica,floresta,shape=1_vp=0_T1,0.8140000000000001,-0.03299999999999981
+sem residuo_fitts,caracteristica,floresta,shape=1_vp=1_T1,0.9960000000000001,-0.0029999999999998916
+sem residuo_fitts,caracteristica,floresta,shape=1_vp=2_T1,0.698,0.2709999999999999
+sem residuo_fitts,caracteristica,floresta,shape=2_vp=0_T1,0.8019999999999999,-0.02200000000000013
+sem residuo_fitts,caracteristica,floresta,shape=2_vp=1_T1,0.9960000000000001,0.001000000000000223
+sem residuo_fitts,caracteristica,floresta,shape=2_vp=2_T1,0.713,0.19199999999999995
+sem instante_pico,caracteristica,svm,shape=0_vp=0_T1,0.974,-0.017000000000000015
+sem instante_pico,caracteristica,svm,shape=0_vp=1_T1,0.994,-0.006000000000000005
+sem instante_pico,caracteristica,svm,shape=0_vp=2_T1,0.647,-0.262
+sem instante_pico,caracteristica,svm,shape=1_vp=0_T1,0.984,-0.0050000000000001155
+sem instante_pico,caracteristica,svm,shape=1_vp=1_T1,0.986,-0.014000000000000012
+sem instante_pico,caracteristica,svm,shape=1_vp=2_T1,0.504,-0.3350000000000001
+sem instante_pico,caracteristica,svm,shape=2_vp=0_T1,0.976,-0.010999999999999899
+sem instante_pico,caracteristica,svm,shape=2_vp=1_T1,0.9629999999999999,-0.037000000000000144
+sem instante_pico,caracteristica,svm,shape=2_vp=2_T1,0.581,-0.255
+sem instante_pico,caracteristica,floresta,shape=0_vp=0_T1,0.682,-0.242
+sem instante_pico,caracteristica,floresta,shape=0_vp=1_T1,0.7,-0.30000000000000004
+sem instante_pico,caracteristica,floresta,shape=0_vp=2_T1,0.288,-0.22000000000000003
+sem instante_pico,caracteristica,floresta,shape=1_vp=0_T1,0.616,-0.23099999999999987
+sem instante_pico,caracteristica,floresta,shape=1_vp=1_T1,0.569,-0.43000000000000005
+sem instante_pico,caracteristica,floresta,shape=1_vp=2_T1,0.178,-0.24900000000000005
+sem instante_pico,caracteristica,floresta,shape=2_vp=0_T1,0.533,-0.29100000000000004
+sem instante_pico,caracteristica,floresta,shape=2_vp=1_T1,0.563,-0.43199999999999994
+sem instante_pico,caracteristica,floresta,shape=2_vp=2_T1,0.321,-0.2
+sem desaceleracao_final,caracteristica,svm,shape=0_vp=0_T1,0.8109999999999999,-0.18000000000000005
+sem desaceleracao_final,caracteristica,svm,shape=0_vp=1_T1,0.9949999999999999,-0.0050000000000001155
+sem desaceleracao_final,caracteristica,svm,shape=0_vp=2_T1,0.8960000000000001,-0.0129999999999999
+sem desaceleracao_final,caracteristica,svm,shape=1_vp=0_T1,0.725,-0.2640000000000001
+sem desaceleracao_final,caracteristica,svm,shape=1_vp=1_T1,0.961,-0.039000000000000035
+sem desaceleracao_final,caracteristica,svm,shape=1_vp=2_T1,0.771,-0.06800000000000006
+sem desaceleracao_final,caracteristica,svm,shape=2_vp=0_T1,0.692,-0.29499999999999993
+sem desaceleracao_final,caracteristica,svm,shape=2_vp=1_T1,0.932,-0.06799999999999995
+sem desaceleracao_final,caracteristica,svm,shape=2_vp=2_T1,0.714,-0.122
+sem desaceleracao_final,caracteristica,floresta,shape=0_vp=0_T1,0.504,-0.42000000000000004
+sem desaceleracao_final,caracteristica,floresta,shape=0_vp=1_T1,0.735,-0.265
+sem desaceleracao_final,caracteristica,floresta,shape=0_vp=2_T1,0.612,0.10399999999999998
+sem desaceleracao_final,caracteristica,floresta,shape=1_vp=0_T1,0.45999999999999996,-0.3869999999999999
+sem desaceleracao_final,caracteristica,floresta,shape=1_vp=1_T1,0.594,-0.405
+sem desaceleracao_final,caracteristica,floresta,shape=1_vp=2_T1,0.45899999999999996,0.03199999999999992
+sem desaceleracao_final,caracteristica,floresta,shape=2_vp=0_T1,0.372,-0.45200000000000007
+sem desaceleracao_final,caracteristica,floresta,shape=2_vp=1_T1,0.583,-0.4119999999999999
+sem desaceleracao_final,caracteristica,floresta,shape=2_vp=2_T1,0.469,-0.052000000000000046
+sem dist_clique,caracteristica,svm,shape=0_vp=0_T1,0.9949999999999999,0.0039999999999998925
+sem dist_clique,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem dist_clique,caracteristica,svm,shape=0_vp=2_T1,0.9280000000000002,0.019000000000000128
+sem dist_clique,caracteristica,svm,shape=1_vp=0_T1,0.994,0.004999999999999893
+sem dist_clique,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem dist_clique,caracteristica,svm,shape=1_vp=2_T1,0.889,0.04999999999999993
+sem dist_clique,caracteristica,svm,shape=2_vp=0_T1,0.994,0.007000000000000117
+sem dist_clique,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem dist_clique,caracteristica,svm,shape=2_vp=2_T1,0.8789999999999999,0.04299999999999993
+sem dist_clique,caracteristica,floresta,shape=0_vp=0_T1,0.9460000000000001,0.02200000000000002
+sem dist_clique,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem dist_clique,caracteristica,floresta,shape=0_vp=2_T1,0.842,0.33399999999999996
+sem dist_clique,caracteristica,floresta,shape=1_vp=0_T1,0.849,0.002000000000000113
+sem dist_clique,caracteristica,floresta,shape=1_vp=1_T1,1.0,0.0010000000000000009
+sem dist_clique,caracteristica,floresta,shape=1_vp=2_T1,0.753,0.32599999999999996
+sem dist_clique,caracteristica,floresta,shape=2_vp=0_T1,0.849,0.02499999999999991
+sem dist_clique,caracteristica,floresta,shape=2_vp=1_T1,0.9949999999999999,0.0
+sem dist_clique,caracteristica,floresta,shape=2_vp=2_T1,0.759,0.238
+sem tempo_parado,caracteristica,svm,shape=0_vp=0_T1,0.9960000000000001,0.0050000000000001155
+sem tempo_parado,caracteristica,svm,shape=0_vp=1_T1,1.0,0.0
+sem tempo_parado,caracteristica,svm,shape=0_vp=2_T1,0.9480000000000001,0.039000000000000035
+sem tempo_parado,caracteristica,svm,shape=1_vp=0_T1,1.0,0.010999999999999899
+sem tempo_parado,caracteristica,svm,shape=1_vp=1_T1,1.0,0.0
+sem tempo_parado,caracteristica,svm,shape=1_vp=2_T1,0.9120000000000001,0.07300000000000006
+sem tempo_parado,caracteristica,svm,shape=2_vp=0_T1,0.9960000000000001,0.00900000000000023
+sem tempo_parado,caracteristica,svm,shape=2_vp=1_T1,1.0,0.0
+sem tempo_parado,caracteristica,svm,shape=2_vp=2_T1,0.9,0.06400000000000006
+sem tempo_parado,caracteristica,floresta,shape=0_vp=0_T1,0.95,0.025999999999999912
+sem tempo_parado,caracteristica,floresta,shape=0_vp=1_T1,1.0,0.0
+sem tempo_parado,caracteristica,floresta,shape=0_vp=2_T1,0.9109999999999999,0.4029999999999999
+sem tempo_parado,caracteristica,floresta,shape=1_vp=0_T1,0.849,0.002000000000000113
+sem tempo_parado,caracteristica,floresta,shape=1_vp=1_T1,1.0,0.0010000000000000009
+sem tempo_parado,caracteristica,floresta,shape=1_vp=2_T1,0.8140000000000001,0.387
+sem tempo_parado,caracteristica,floresta,shape=2_vp=0_T1,0.835,0.010999999999999899
+sem tempo_parado,caracteristica,floresta,shape=2_vp=1_T1,0.9970000000000001,0.002000000000000224
+sem tempo_parado,caracteristica,floresta,shape=2_vp=2_T1,0.8219999999999998,0.3009999999999998
+sem grupo geometricas,grupo,svm,shape=0_vp=0_T1,0.978,-0.013000000000000012
+sem grupo geometricas,grupo,svm,shape=0_vp=1_T1,1.0,0.0
+sem grupo geometricas,grupo,svm,shape=0_vp=2_T1,0.681,-0.22799999999999998
+sem grupo geometricas,grupo,svm,shape=1_vp=0_T1,0.969,-0.02000000000000013
+sem grupo geometricas,grupo,svm,shape=1_vp=1_T1,1.0,0.0
+sem grupo geometricas,grupo,svm,shape=1_vp=2_T1,0.673,-0.16600000000000004
+sem grupo geometricas,grupo,svm,shape=2_vp=0_T1,0.984,-0.0029999999999998916
+sem grupo geometricas,grupo,svm,shape=2_vp=1_T1,1.0,0.0
+sem grupo geometricas,grupo,svm,shape=2_vp=2_T1,0.705,-0.131
+sem grupo geometricas,grupo,floresta,shape=0_vp=0_T1,0.998,0.07399999999999995
+sem grupo geometricas,grupo,floresta,shape=0_vp=1_T1,1.0,0.0
+sem grupo geometricas,grupo,floresta,shape=0_vp=2_T1,0.797,0.28900000000000003
+sem grupo geometricas,grupo,floresta,shape=1_vp=0_T1,1.0,0.15300000000000014
+sem grupo geometricas,grupo,floresta,shape=1_vp=1_T1,1.0,0.0010000000000000009
+sem grupo geometricas,grupo,floresta,shape=1_vp=2_T1,0.841,0.4139999999999999
+sem grupo geometricas,grupo,floresta,shape=2_vp=0_T1,0.994,0.16999999999999993
+sem grupo geometricas,grupo,floresta,shape=2_vp=1_T1,1.0,0.0050000000000001155
+sem grupo geometricas,grupo,floresta,shape=2_vp=2_T1,0.86,0.33899999999999997
+sem grupo cinematicas,grupo,svm,shape=0_vp=0_T1,0.992,0.0010000000000000009
+sem grupo cinematicas,grupo,svm,shape=0_vp=1_T1,1.0,0.0
+sem grupo cinematicas,grupo,svm,shape=0_vp=2_T1,0.953,0.04399999999999993
+sem grupo cinematicas,grupo,svm,shape=1_vp=0_T1,0.9709999999999999,-0.018000000000000238
+sem grupo cinematicas,grupo,svm,shape=1_vp=1_T1,1.0,0.0
+sem grupo cinematicas,grupo,svm,shape=1_vp=2_T1,0.8310000000000001,-0.008000000000000007
+sem grupo cinematicas,grupo,svm,shape=2_vp=0_T1,0.974,-0.0129999999999999
+sem grupo cinematicas,grupo,svm,shape=2_vp=1_T1,1.0,0.0
+sem grupo cinematicas,grupo,svm,shape=2_vp=2_T1,0.8789999999999999,0.04299999999999993
+sem grupo cinematicas,grupo,floresta,shape=0_vp=0_T1,0.915,-0.009000000000000008
+sem grupo cinematicas,grupo,floresta,shape=0_vp=1_T1,1.0,0.0
+sem grupo cinematicas,grupo,floresta,shape=0_vp=2_T1,0.6689999999999999,0.16099999999999992
+sem grupo cinematicas,grupo,floresta,shape=1_vp=0_T1,0.773,-0.07399999999999984
+sem grupo cinematicas,grupo,floresta,shape=1_vp=1_T1,0.999,0.0
+sem grupo cinematicas,grupo,floresta,shape=1_vp=2_T1,0.45,0.022999999999999965
+sem grupo cinematicas,grupo,floresta,shape=2_vp=0_T1,0.75,-0.07400000000000007
+sem grupo cinematicas,grupo,floresta,shape=2_vp=1_T1,0.998,0.0030000000000001137
+sem grupo cinematicas,grupo,floresta,shape=2_vp=2_T1,0.526,0.0050000000000000044
+sem grupo temporais,grupo,svm,shape=0_vp=0_T1,0.975,-0.016000000000000014
+sem grupo temporais,grupo,svm,shape=0_vp=1_T1,0.9960000000000001,-0.0039999999999998925
+sem grupo temporais,grupo,svm,shape=0_vp=2_T1,0.6839999999999999,-0.2250000000000001
+sem grupo temporais,grupo,svm,shape=1_vp=0_T1,0.992,0.0029999999999998916
+sem grupo temporais,grupo,svm,shape=1_vp=1_T1,0.986,-0.014000000000000012
+sem grupo temporais,grupo,svm,shape=1_vp=2_T1,0.545,-0.29400000000000004
+sem grupo temporais,grupo,svm,shape=2_vp=0_T1,0.982,-0.004999999999999893
+sem grupo temporais,grupo,svm,shape=2_vp=1_T1,0.962,-0.038000000000000034
+sem grupo temporais,grupo,svm,shape=2_vp=2_T1,0.5700000000000001,-0.2659999999999999
+sem grupo temporais,grupo,floresta,shape=0_vp=0_T1,0.78,-0.14400000000000002
+sem grupo temporais,grupo,floresta,shape=0_vp=1_T1,0.852,-0.14800000000000002
+sem grupo temporais,grupo,floresta,shape=0_vp=2_T1,0.317,-0.191
+sem grupo temporais,grupo,floresta,shape=1_vp=0_T1,0.635,-0.21199999999999986
+sem grupo temporais,grupo,floresta,shape=1_vp=1_T1,0.6140000000000001,-0.3849999999999999
+sem grupo temporais,grupo,floresta,shape=1_vp=2_T1,0.176,-0.25100000000000006
+sem grupo temporais,grupo,floresta,shape=2_vp=0_T1,0.5429999999999999,-0.28100000000000014
+sem grupo temporais,grupo,floresta,shape=2_vp=1_T1,0.603,-0.3919999999999999
+sem grupo temporais,grupo,floresta,shape=2_vp=2_T1,0.279,-0.242
+sem grupo aproximacao_clique,grupo,svm,shape=0_vp=0_T1,0.9190000000000002,-0.07199999999999984
+sem grupo aproximacao_clique,grupo,svm,shape=0_vp=1_T1,1.0,0.0
+sem grupo aproximacao_clique,grupo,svm,shape=0_vp=2_T1,0.9480000000000001,0.039000000000000035
+sem grupo aproximacao_clique,grupo,svm,shape=1_vp=0_T1,0.817,-0.17200000000000015
+sem grupo aproximacao_clique,grupo,svm,shape=1_vp=1_T1,0.9879999999999999,-0.012000000000000122
+sem grupo aproximacao_clique,grupo,svm,shape=1_vp=2_T1,0.8550000000000001,0.016000000000000014
+sem grupo aproximacao_clique,grupo,svm,shape=2_vp=0_T1,0.788,-0.19899999999999984
+sem grupo aproximacao_clique,grupo,svm,shape=2_vp=1_T1,0.959,-0.041000000000000036
+sem grupo aproximacao_clique,grupo,svm,shape=2_vp=2_T1,0.845,0.009000000000000008
+sem grupo aproximacao_clique,grupo,floresta,shape=0_vp=0_T1,0.549,-0.375
+sem grupo aproximacao_clique,grupo,floresta,shape=0_vp=1_T1,0.772,-0.22799999999999998
+sem grupo aproximacao_clique,grupo,floresta,shape=0_vp=2_T1,0.547,0.039000000000000035
+sem grupo aproximacao_clique,grupo,floresta,shape=1_vp=0_T1,0.461,-0.38599999999999984
+sem grupo aproximacao_clique,grupo,floresta,shape=1_vp=1_T1,0.642,-0.357
+sem grupo aproximacao_clique,grupo,floresta,shape=1_vp=2_T1,0.508,0.08099999999999996
+sem grupo aproximacao_clique,grupo,floresta,shape=2_vp=0_T1,0.378,-0.44600000000000006
+sem grupo aproximacao_clique,grupo,floresta,shape=2_vp=1_T1,0.611,-0.3839999999999999
+sem grupo aproximacao_clique,grupo,floresta,shape=2_vp=2_T1,0.497,-0.02400000000000002
